@@ -1,3 +1,15 @@
+v2.0	(16 Sep 2013)
+
+ * added MK-54 emulation
+ * application name was changed to "MK 61/54" to reflect the fact it supports both devices
+ * when calculator is switched off, selector button chooses between "MK 61" and "MK-54"
+ * save states remember which calculator type they were saved with
+ * old save states use MK 61 device
+
+ * added soft "Menu" button on devices that lack hardware menu button
+ * added support for older Android versions, including Android 1.6
+ * additional UI polishing for tablets
+
 v1.7	(12 Sep 2013)
 
  * fixed ГРД angle mode switch position (was acting as Degrees mode instead of Grads)
