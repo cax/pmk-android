@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.MessageFormat;
 
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -17,6 +18,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
@@ -27,8 +29,6 @@ import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -40,102 +40,113 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-	private static final String ANGLE_MODE_PREFERENCE_KEY = "angleMode";
-	private static final String SPEED_MODE_PREFERENCE_KEY = "speedMode";
-	private static final String MK_MODEL_PREFERENCE_KEY   = "mkModel";
-	private static final String PERSISTENCE_STATE_FILENAME = "persist";
+	private static final String PERSISTENCE_STATE_FILENAME 	= "persist";
     private static final String PERSISTENCE_STATE_EXTENSION = ".pmk";
-    private static final int    EDIT_TEXT_ENTRY_ID = 12345;
-	private static final int    SAVE_SLOTS_NUMBER = 99;
-	private static final int    SAVE_NAME_MAX_LEN = 25;
+	private static final String EMPTY_INDICATOR = "/ / / / / / / / / / / / /"; // slash is an empty comma placeholder in indicator font
+	
+	private static final String INDCATOR_OFF_COLOR 		  = "#000000";
+	private static final String INDCATOR_FAST_SPEED_COLOR = "#444444";
+	private static final String INDCATOR_SLOW_SPEED_COLOR = "#001500";
+	
 	private static final int    VIBRATE_ON_OFF_SWITCH = 50;
 	private static final int    VIBRATE_ANGLE_SWITCH  = 20;
 	private static final int    VIBRATE_KEYPAD 		  = 15;
-	private static final boolean useFelixCode = false;
+	
+	private static final int    EDIT_TEXT_ENTRY_ID = 12345; // it has to be some number, so let it be 12345
+	private static final int    SAVE_SLOTS_NUMBER = 99;
+	private static final int    SAVE_NAME_MAX_LEN = 25;
+
+	private EmulatorInterface emulator = null;
 	private int selectedSaveSlot = 0;
     private int tempSaveSlot = 0;
-	private EmulatorInterface emulator = null;
 	private int angleMode = 0;
 	private int speedMode = 0;
 	private int mkModel = 0; // 0 for MK-61, 1 for MK-54
-	private TextView calculatorDisplay = null;
-	private Button mkModelButton = null;
-    private CheckBox powerOnOffCheckbox = null;
-    private int yellowLabelLeftPadding = 0;
-	private Vibrator vibrator = null;
+
+	private int yellowLabelLeftPadding = 0;
 	private boolean  vibrate = true;
 	private int calcNameTouchCounter = 0;
+
+	private TextView calculatorIndicator = null;
+    private CheckBox powerOnOffCheckbox = null;
+	private Vibrator vibrator = null;
 	
     // ----------------------- Activity life cycle handlers --------------------------------
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        
         setContentView(R.layout.activity_main_mk_61);
 
+        // remember on/off check box
         powerOnOffCheckbox = (CheckBox)findViewById(R.id.checkBoxPowerOnOff); 
 
-        calculatorDisplay = (TextView) findViewById(R.id.textView_Indicator);
-        Typeface tf = Typeface.createFromAsset(this.getAssets(), "fonts/digital-7-mod.ttf");
-        calculatorDisplay.setTypeface(tf);
-        calculatorDisplay.setText("");
-
+        // remember labels padding for later use
         yellowLabelLeftPadding = findViewById(R.id.label10powerX).getPaddingLeft();
         
-        tf = Typeface.createFromAsset(this.getAssets(), "fonts/missing-symbols.ttf");
-        ((TextView)findViewById(R.id.labelSquare))  .setTypeface(tf);
-        ((TextView)findViewById(R.id.labelEpowerX)) .setTypeface(tf);
-        ((TextView)findViewById(R.id.label10powerX)).setTypeface(tf);
-        ((TextView)findViewById(R.id.labelXpowerY)) .setTypeface(tf);
-        ((TextView)findViewById(R.id.labelDot))     .setTypeface(tf);
-
-        ((Button)findViewById(R.id.buttonUpStack)).setTypeface(tf, Typeface.BOLD);
-
+        // remember vibrator service
+        vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
         
+        // style indicator
+        calculatorIndicator = (TextView) findViewById(R.id.textView_Indicator);
+        Typeface tf = Typeface.createFromAsset(this.getAssets(), "fonts/digital-7-mod.ttf");
+        calculatorIndicator.setTypeface(tf);
+        calculatorIndicator.setText(EMPTY_INDICATOR); // let AutoScaleTextView do the work - set font size and fix layout
+
+        // use manually created symbols for some labels
+        tf = Typeface.createFromAsset(this.getAssets(), "fonts/missing-symbols.ttf");
+        for (int viewId : new int[] { R.id.labelSquare, R.id.labelEpowerX, R.id.label10powerX, R.id.labelXpowerY, R.id.labelDot }) {
+        	((TextView)findViewById(viewId)).setTypeface(tf);
+        }
+        
+        // use manually created symbols for some buttons
+        for (int viewId : new int[] { R.id.buttonUpStack, 		R.id.buttonStepBack, 	R.id.buttonStepForward, 
+        							  R.id.buttonRegisterToX, 	R.id.buttonXToRegister, R.id.buttonExchangeXY }) {
+        	((Button)findViewById(viewId)).setTypeface(tf, Typeface.NORMAL);
+        }
+        
+        // color buttons
         findViewById(R.id.buttonF)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x00F5E345)); // yellow
         findViewById(R.id.buttonK)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x0071E3FF)); // blue
         findViewById(R.id.buttonClear).getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);            // red
         
-        int blackButtons[] = new int[] { 
-        		R.id.buttonStepForward, R.id.buttonStepBack,    R.id.buttonReturn, R.id.buttonStopStart,
-        		R.id.buttonRegisterToX, R.id.buttonXToRegister, R.id.buttonGoto,   R.id.buttonSubroutine
-        };
-        for (int button: blackButtons) {
-        	findViewById(button).getBackground().setColorFilter(new LightingColorFilter(0,0));
+        for (int button: new int[] { R.id.buttonStepForward, R.id.buttonStepBack,    R.id.buttonReturn, R.id.buttonStopStart,
+    		    					 R.id.buttonRegisterToX, R.id.buttonXToRegister, R.id.buttonGoto,   R.id.buttonSubroutine }) {
+        	findViewById(button).getBackground().setColorFilter(new LightingColorFilter(0,0)); // black
         }
 
-        vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-        
+        // preferences initialization
         PreferenceManager.setDefaultValues(this, R.layout.preferences, false);
         activateSettings();
         
-        // recover speed and angle modes even if calculator was switched off before destroying
+        // recover speed and angle modes from preferences even if calculator was switched off before destroying
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        speedMode = sharedPref.getInt(SPEED_MODE_PREFERENCE_KEY, 0);
-        angleMode = sharedPref.getInt(ANGLE_MODE_PREFERENCE_KEY, 0);
+        speedMode = sharedPref.getInt(SettingsActivity.SPEED_MODE_PREFERENCE_KEY, 0);
+        angleMode = sharedPref.getInt(SettingsActivity.ANGLE_MODE_PREFERENCE_KEY, 0);
         setAngleModeRadios();
         
-        setMkModel(sharedPref.getInt(MK_MODEL_PREFERENCE_KEY,   0));
-
-        mkModelButton = (Button) findViewById(R.id.mk_model);
+        // recover and set mkModel
+        setMkModel(sharedPref.getInt(SettingsActivity.MK_MODEL_PREFERENCE_KEY, 0));
 	}
 
 	@Override
     public void onDestroy() {
-		// remember speed and angle modes even if calculator was switched off before destroying
+		// remember speed mode, angle mode and mk model even if calculator was switched off before destroying
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-    	SharedPreferences.Editor editor = sharedPref.edit();
-    	editor.putInt(SPEED_MODE_PREFERENCE_KEY, speedMode);
-    	editor.putInt(ANGLE_MODE_PREFERENCE_KEY, angleMode);
-    	editor.putInt(MK_MODEL_PREFERENCE_KEY,   mkModel);
+    	
+        SharedPreferences.Editor editor = sharedPref.edit();
+    	editor.putInt(SettingsActivity.SPEED_MODE_PREFERENCE_KEY, speedMode);
+    	editor.putInt(SettingsActivity.ANGLE_MODE_PREFERENCE_KEY, angleMode);
+    	editor.putInt(SettingsActivity.MK_MODEL_PREFERENCE_KEY,   mkModel);
     	editor.commit();
+    	
     	super.onDestroy();
 	}
 	
 	@Override
     public void onStart() {
     	super.onStart();
-    	if (! loadState(-1)) {
+    	if (! loadState(-1)) { // load persistence emulation state
     		switchOnCalculator(true);
     	}
     }
@@ -143,7 +154,7 @@ public class MainActivity extends Activity {
     @Override
     public void onStop() {
     	super.onStop();
-       	saveState(-1);
+       	saveState(-1); // load persistence emulation state
     }
 
     @Override
@@ -152,17 +163,42 @@ public class MainActivity extends Activity {
         activateSettings();
     }
     
+    // ----------------------- Menu hooks --------------------------------
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem menu_save = menu.findItem(R.id.menu_save);      
+        MenuItem menu_swap = menu.findItem(R.id.menu_swap_model);      
+
+        if(powerOnOffCheckbox.isChecked()) 
+        {           
+        	menu_swap.setVisible(false);
+        	menu_save.setVisible(true);
+        }
+        else
+        {
+        	menu_swap.setVisible(true);
+        	menu_save.setVisible(false);
+        }
+        return true;
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+		getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	 switch (item.getItemId()) {
-    	    case R.id.menu_settings:
+	    	 case R.id.menu_about:
+	    		 aboutDialog();
+	 	        return true;
+	    	 case R.id.menu_settings:
     	    	goSettingsScreen();
+    	        return true;
+    	    case R.id.menu_swap_model:
+    	    	onChooseMkModel();
     	        return true;
     	    case R.id.menu_save:
     	    	chooseAndUseSaveSlot(true);
@@ -170,6 +206,7 @@ public class MainActivity extends Activity {
     	    case R.id.menu_load:
     	    	chooseAndUseSaveSlot(false);
     	        return true;
+    	        
     	    default:
     	        return super.onOptionsItemSelected(item);
     	    }
@@ -186,8 +223,8 @@ public class MainActivity extends Activity {
     		emulator.setMkModel(mkModel);
     }
 
-    // calculator model button callback
-    public void onChooseMkModel(View view) {
+    // calculator model menu option callback
+    public void onChooseMkModel() {
 	    ContextThemeWrapper cw = new ContextThemeWrapper( this, R.style.AlertDialogTheme );
 		AlertDialog.Builder builder = new AlertDialog.Builder(cw);
 	
@@ -216,12 +253,6 @@ public class MainActivity extends Activity {
     	if (vibrate) vibrator.vibrate(VIBRATE_ON_OFF_SWITCH);
     	boolean isOn = ((CheckBox)view).isChecked();
     	switchOnCalculator(isOn);
-    	setVisibilityMkModelChooser();
-    }
-    
-    void setVisibilityMkModelChooser() {
-    	boolean isOn = powerOnOffCheckbox.isChecked();
-    	mkModelButton.setVisibility(isOn ? View.INVISIBLE : View.VISIBLE);
     }
     
     // calculator mode switch callback
@@ -243,13 +274,19 @@ public class MainActivity extends Activity {
     	if (vibrate) vibrator.vibrate(VIBRATE_KEYPAD);
     }
     
+    // on settings menu selected
+    private void goSettingsScreen() {
+    	Intent settingsScreen = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(settingsScreen);
+    }
+    
     // Show string on calculator display 
     // Not really a callback - called also from Emulator thread  
     public void setDisplay(final String text) {
     	runOnUiThread(new Runnable() {
     	   public void run() {
-    		   if (calculatorDisplay != null)
-    			   calculatorDisplay.setText(text);
+    		   if (calculatorIndicator != null)
+    			   calculatorIndicator.setText(text);
     	   }
     	});
     }
@@ -297,10 +334,39 @@ public class MainActivity extends Activity {
 		alert.show();		
 	}
 	
-    private void goSettingsScreen() {
-    	Intent settingsScreen = new Intent(getApplicationContext(), SettingsActivity.class);
-        startActivity(settingsScreen);
-    }
+	private void aboutDialog() {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+ 
+		// set title
+		alertDialogBuilder.setTitle(getString(R.string.menu_about));
+ 
+		String versionName = "";
+		try {
+			versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e) {
+		    e.printStackTrace();
+		}
+		    
+		// set dialog message
+		alertDialogBuilder.setMessage(MessageFormat.format(getString(R.string.msg_about), versionName));
+		
+		alertDialogBuilder.setNegativeButton(getString(R.string.label_close), new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+					dialog.cancel();
+			}
+		});
+
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+ 		 
+		// show it
+		alertDialog.show();
+ 
+		// change font size
+		TextView textView = (TextView) alertDialog.findViewById(android.R.id.message);
+		textView.setTextSize(14);
+
+	}
     
 	// ----------------------- Save/Load emulator state --------------------------------
     private void chooseNameAndSaveState() {
@@ -405,9 +471,7 @@ public class MainActivity extends Activity {
 		try {
 			fileIn = openFileInput(filename);
 			in = new ObjectInputStream(fileIn);
-			loadedEmulator = useFelixCode 
-            		? (com.cax.pmk.felix.Emulator)    in.readObject()
-            		: (com.cax.pmk.emulator.Emulator) in.readObject();
+			loadedEmulator = (com.cax.pmk.emulator.Emulator) in.readObject();
 			in.close();
 			fileIn.close();
 			
@@ -437,26 +501,24 @@ public class MainActivity extends Activity {
     	
     	emulator.start();
 
-		setVisibilityMkModelChooser();
-
 		return true;
     }
 
     // ----------------------- Other --------------------------------
 	private static final int[] blueLabels = {
-		R.id.labelFloor,R.id.labelFrac,R.id.labelMax, 
-		R.id.labelAbs,R.id.labelSign,R.id.labelFromHM,R.id.labelToHM,
-		R.id.labelFromHMS,R.id.labelToHMS,R.id.labelRandom,
-		R.id.labelNOP,R.id.labelAnd,R.id.labelOr,R.id.labelXor,R.id.labelInv
+		R.id.labelFloor,	R.id.labelFrac,	R.id.labelMax, 
+		R.id.labelAbs,		R.id.labelSign,	R.id.labelFromHM,	R.id.labelToHM,
+											R.id.labelFromHMS,	R.id.labelToHMS,R.id.labelRandom,
+		R.id.labelNOP,		R.id.labelAnd,	R.id.labelOr,		R.id.labelXor,	R.id.labelInv
 	};
 	
 	private static final CharSequence[] blueLabelsText = new CharSequence[blueLabels.length];
     
 	private static final int[] pairedYellowLabels = {
-		R.id.labelSin,R.id.labelCos,R.id.labelTg,
-		R.id.labelArcSin,R.id.labelArcCos,R.id.labelArcTg,R.id.labelPi,
-		R.id.labelLn,R.id.labelXpowerY,R.id.labelBx,
-		R.id.label10powerX,R.id.labelDot,R.id.labelAVT,R.id.labelPRG,R.id.labelCF
+		R.id.labelSin,		R.id.labelCos,		R.id.labelTg,
+		R.id.labelArcSin,	R.id.labelArcCos,	R.id.labelArcTg,	R.id.labelPi,
+												R.id.labelLn,		R.id.labelXpowerY,	R.id.labelBx,
+		R.id.label10powerX,	R.id.labelDot,		R.id.labelAVT,		R.id.labelPRG,		R.id.labelCF
 	};
 
 	void setMkModel(int mkModel) {
@@ -523,13 +585,13 @@ public class MainActivity extends Activity {
     private void activateSettings() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         vibrate = sharedPref.getBoolean(SettingsActivity.PREFERENCE_VIBRATE, true);
-  		calculatorDisplay.setKeepScreenOn(sharedPref.getBoolean(SettingsActivity.PREFERENCE_SCREEN_ALWAYS_ON, true));
+  		calculatorIndicator.setKeepScreenOn(sharedPref.getBoolean(SettingsActivity.PREFERENCE_SCREEN_ALWAYS_ON, true));
     }
         
     private void setIndicatorColor() {
-    	String color = "#000000";
+    	String color = INDCATOR_OFF_COLOR;
     	if (emulator != null) {
-    		color = emulator.getSpeedMode() == 0 ? "#444444" : "#001500";
+    		color = emulator.getSpeedMode() == 0 ? INDCATOR_FAST_SPEED_COLOR : INDCATOR_SLOW_SPEED_COLOR;
     	}
     	((LinearLayout)findViewById(R.id.linearLayout_Indicator))
     			.setBackgroundColor(Color.parseColor(color));
@@ -538,9 +600,7 @@ public class MainActivity extends Activity {
     private void switchOnCalculator(boolean enable) {
     	if (enable) {
     		if (powerOnOffCheckbox.isChecked()) {
-	            emulator = useFelixCode 
-	            		? new com.cax.pmk.felix.Emulator()
-	            		: new com.cax.pmk.emulator.Emulator();
+	            emulator = new com.cax.pmk.emulator.Emulator();
 	    		emulator.setAngleMode(angleMode);
 	    		emulator.setSpeedMode(speedMode);
 	    		emulator.setMkModel(mkModel);
@@ -553,7 +613,7 @@ public class MainActivity extends Activity {
     			emulator.stopEmulator();
     			emulator = null;
     		}
-            calculatorDisplay.setText("");
+            calculatorIndicator.setText(EMPTY_INDICATOR);
             powerOnOffCheckbox.setChecked(false);
             //erase persistence file
             File file = getFileStreamPath(getSlotFilename(-1));

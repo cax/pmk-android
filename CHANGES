@@ -1,3 +1,16 @@
+v2.1	(22 Sep 2013)
+
+ * "MK 61 ↔ MK-54" button is now menu option (available when calculator is off)
+ * "About" moved from settings to menu, now with usage hints
+
+ * fixed calculator's display font size issue:
+ * entering exponent should not split display into two lines (was an issue on some devices)
+ * width should be fully used
+
+ * ШГ→/ШГ←/↔ got better labels
+
+ * fixed/improved layout on devices with low and medium resolution
+
 v2.0	(16 Sep 2013)
 
  * added MK-54 emulation

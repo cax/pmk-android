@@ -10,8 +10,4 @@
 		    android:summary="@string/settings_screen_always_on_summary"
 		    android:key="pref_screen_always_on"
 		    android:defaultValue="true"/>
-		
-		<Preference 
-		    android:title="@string/settings_about_title" 
-		    android:key="about"/>
 </PreferenceScreen>

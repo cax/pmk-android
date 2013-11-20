@@ -1,0 +1,11 @@
+<resources>
+
+    <dimen name="button_font_size_regular">42sp</dimen>
+    <dimen name="button_font_size_smaller">42sp</dimen>
+    
+    <dimen name="label_font_size">21sp</dimen>
+    <dimen name="mk_label_font_size">20sp</dimen>
+    
+    <dimen name="button_radius">6dp</dimen>
+    
+</resources>

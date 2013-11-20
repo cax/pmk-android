@@ -16,23 +16,26 @@
         android:onClick="onIndicator"
         android:orientation="vertical" >
     
-        <TextView
+        <com.cax.pmk.AutoScaleTextView
             android:id="@+id/textView_Indicator"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="center_vertical"
-            android:gravity="left|center_vertical"
-            android:height="55dp"
+            android:gravity="center_vertical|left"
+            android:lines="1"
             android:maxLines="1"
+            android:minHeight="55dp"
+            android:minLines="1"
             android:paddingLeft="4dp"
             android:paddingRight="0dp"
             android:text="@string/indicatorTestString"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#77FF77"
-            android:textSize="@dimen/indicator_font_size" />
+            android:scrollHorizontally="true"
+            android:textSize="130sp" />
         
     </LinearLayout>
-
+    
 	<!-- ======================= Switches ======================== -->
 
 <TableLayout
@@ -58,7 +61,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="3dp"
-                android:layout_span="3"
                 android:layout_weight="5"
                 android:clickable="true"
                 android:onClick="onCalculatorName"
@@ -84,19 +86,6 @@
                 android:onClick="onPower"
                 android:text="@string/checkBoxPowerOnOff" />
 
-            <Button
-                android:id="@+id/mk_model"
-                android:layout_gravity="left|center_vertical"
-                android:layout_marginRight="2dp"
-                android:layout_weight="2"
-                android:onClick="onChooseMkModel"
-                android:text="@string/buttonChooseMkModel" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1" />
-        
               <RadioGroup
                   android:id="@+id/radioGroup_mode"
                   android:layout_width="wrap_content"
@@ -109,7 +98,7 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:layout_weight="1"
-                      android:gravity="center|right"
+                      android:gravity="center_vertical|right"
                       android:paddingRight="3dp"
                       android:text="@string/TextViewRadians" />
 
@@ -150,6 +139,7 @@
                       android:layout_height="wrap_content"
                       android:layout_marginRight="3dp"
                       android:layout_weight="1"
+                      android:gravity="center_vertical|right"
                       android:text="@string/TextViewDegrees" />
 
               </RadioGroup>
@@ -226,7 +216,7 @@
                 android:text="@string/buttonStepForward"
                 android:textColor="@color/whiteColor"
                 android:textColorHint="@color/whiteColor"
-                android:textSize="@dimen/button_font_size_smallest"
+                android:textSize="@dimen/button_font_size_regular"
                 android:textStyle="bold" />
 
        </LinearLayout>
@@ -255,7 +245,7 @@
                 android:text="@string/buttonStepBack"
                 android:textColor="@color/whiteColor"
                 android:textColorHint="@color/whiteColor"
-                android:textSize="@dimen/button_font_size_smallest"
+                android:textSize="@dimen/button_font_size_regular"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -382,7 +372,7 @@
                 android:text="@string/buttonRegisterToX"
                 android:textColor="@color/whiteColor"
                 android:textColorHint="@color/whiteColor"
-                android:textSize="@dimen/button_font_size_smallest"
+                android:textSize="@dimen/button_font_size_regular"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -411,7 +401,7 @@
                 android:text="@string/buttonXToRegister"
                 android:textColor="@color/whiteColor"
                 android:textColorHint="@color/whiteColor"
-                android:textSize="@dimen/button_font_size_smallest"
+                android:textSize="@dimen/button_font_size_regular"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -1090,10 +1080,12 @@
 			</RelativeLayout>
 
             <Button
+                android:id="@+id/buttonExchangeXY"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
+                android:background="@drawable/button"
+                android:onClick="onButton"
                 android:tag="24"
                 android:text="@string/buttonExchangeXY"
                 android:textColor="@color/blackColor"
@@ -1408,7 +1400,8 @@
 				    android:layout_height="wrap_content"
 				    android:layout_gravity="center"
 				    android:text=""
-				    android:textColor="@color/whiteColor" />
+				    android:textColor="@color/whiteColor"
+				    android:textSize="@dimen/label_font_size" />
 
 		</LinearLayout>
 			<LinearLayout

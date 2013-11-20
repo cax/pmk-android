@@ -5,11 +5,8 @@
          screen margins) for sw600dp devices (e.g. 7" tablets) here.
     -->
 
-    <dimen name="indicator_font_size">90sp</dimen>
-    
     <dimen name="button_font_size_regular">46sp</dimen>
     <dimen name="button_font_size_smaller">46sp</dimen>
-    <dimen name="button_font_size_smallest">36sp</dimen>
     
     <dimen name="label_font_size">25sp</dimen>
     <dimen name="mk_label_font_size">14sp</dimen>
