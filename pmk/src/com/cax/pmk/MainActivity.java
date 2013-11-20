@@ -8,12 +8,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,19 +35,41 @@ public class MainActivity extends Activity {
 	private int selectedSaveSlot = 0;
     private int tempSaveSlot = 0;
 	private EmulatorInterface emulator = null;
-	private int mode = 0;
+	private int angleMode = 0;
+	private int speedMode = 0;
 	private TextView calculatorDisplay = null;
+	private Vibrator vibrator = null;
 		
     // ----------------------- Activity life cycle handlers --------------------------------
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+        
+        findViewById(R.id.buttonF)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x00F5E345)); // yellow
+        findViewById(R.id.buttonK)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x0071E3FF)); // blue
+        findViewById(R.id.buttonClear).getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);            // red
+        
+        int blackButtons[] = new int[] { 
+        		R.id.buttonStepForward, R.id.buttonStepBack,    R.id.buttonReturn, R.id.buttonStopStart,
+        		R.id.buttonRegisterToX, R.id.buttonXToRegister, R.id.buttonGoto,   R.id.buttonSubroutine
+        };
+        for (int button: blackButtons) {
+        	findViewById(button).getBackground().setColorFilter(new LightingColorFilter(0,0));
+        }
 
         calculatorDisplay = (TextView) findViewById(R.id.textView_Indicator);
         Typeface tf = Typeface.createFromAsset(this.getAssets(), "fonts/digital-7-mod.ttf");
         calculatorDisplay.setTypeface(tf);
 
+        tf = Typeface.createFromAsset(this.getAssets(), "fonts/missing-symbols.ttf");
+        ((TextView)findViewById(R.id.labelSquare))  .setTypeface(tf);
+        ((TextView)findViewById(R.id.labelEpowerX)) .setTypeface(tf);
+        ((TextView)findViewById(R.id.label10powerX)).setTypeface(tf);
+        ((TextView)findViewById(R.id.labelXpowerY)) .setTypeface(tf);
+        ((TextView)findViewById(R.id.labelDot))     .setTypeface(tf);
 	}
 
     @Override
@@ -91,6 +116,7 @@ public class MainActivity extends Activity {
     public void onIndicator(View view) {
         if (emulator != null) {
         	emulator.setSpeedMode(1 - emulator.getSpeedMode());
+        	speedMode = emulator.getSpeedMode();
         }
     	setIndicatorColor();
     }
@@ -98,13 +124,16 @@ public class MainActivity extends Activity {
     // calculator power switch callback
     public void onPower(View view) {
     	switchOnCalculator(((CheckBox)view).isChecked());
+    	vibrator.vibrate(300);
     }
     
     // calculator mode switch callback
     public void onMode(View view) {
-        mode = Integer.parseInt((String)view.getTag());
-        if (emulator != null)
-        	emulator.setAngleMode(mode);
+        angleMode = Integer.parseInt((String)view.getTag());
+        if (emulator != null) {
+        	emulator.setAngleMode(angleMode);
+        	vibrator.vibrate(20);
+        }
     }
 
     // calculator button press callback
@@ -114,7 +143,7 @@ public class MainActivity extends Activity {
     	
     	int keycode = Integer.parseInt((String)view.getTag());
     	emulator.keypad(keycode);
-
+    	vibrator.vibrate(15);
     }
     
     // Show string on calculator display 
@@ -306,10 +335,11 @@ public class MainActivity extends Activity {
     		emulator = loadedEmulator;
 
         	((CheckBox)findViewById(R.id.checkBoxPowerOnOff)).setChecked(true);
-        	mode = emulator.getAngleMode();
-        	((RadioButton)findViewById(R.id.radioRadians)).setChecked(mode==0);
-        	((RadioButton)findViewById(R.id.radioDegrees)).setChecked(mode==1);
-        	((RadioButton)findViewById(R.id.radioGrads))  .setChecked(mode==2);
+        	angleMode = emulator.getAngleMode();
+        	speedMode = emulator.getSpeedMode();
+        	((RadioButton)findViewById(R.id.radioRadians)).setChecked(angleMode==0);
+        	((RadioButton)findViewById(R.id.radioDegrees)).setChecked(angleMode==1);
+        	((RadioButton)findViewById(R.id.radioGrads))  .setChecked(angleMode==2);
         	emulator.initTransient(this);
         	setIndicatorColor();
             emulator.start();
@@ -333,7 +363,8 @@ public class MainActivity extends Activity {
 	            emulator = useFelixCode 
 	            		? new com.cax.pmk.felix.Emulator()
 	            		: new com.cax.pmk.emulator.Emulator();
-	    		emulator.setAngleMode(mode);
+	    		emulator.setAngleMode(angleMode);
+	    		emulator.setSpeedMode(speedMode);
 	    		emulator.initTransient(this);
 	        	setIndicatorColor();
 	            emulator.start();
