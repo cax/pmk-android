@@ -1,6 +1,12 @@
-v1.1	(22 Aug 2013)
+v1.2	(23 Aug 2013)
+
+ * keep state after pressing Home or Back
+
+v1.1	(21 Aug 2013)
 
  * first release to Google Play
+ * fixed UI bugs
+ * speed optimization
 
 v1.0	(20 Aug 2013)
 

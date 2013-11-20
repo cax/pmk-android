@@ -1,66 +1,19 @@
 package com.cax.pmk;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Emulator extends Thread
+public class Emulator extends Thread implements Serializable
 {
-    public final void on_sync(byte[] display)
+    public final void setMode(int mode)
     {
-        if (Arrays.equals(old_display, display))
-        	return;
-
-		int i;
-
-		disp.setLength(0);
-		for(i = 0;i<9;i++)
-		{
-			disp.append(segments[display[8-i]&0xf]);
-			if((display[8-i]&0x80) != 0)
-			{
-				disp.append('.');
-			}
-		}
-		for(i = 0;i<3;i++)
-		{
-			disp.append(segments[display[11-i]&0xf]);
-			if((display[11-i]&0x80) != 0)
-			{
-				disp.append('.');
-			}
-		}
-
-		mainActivity.setDisplay(disp.toString());
-		
-		byte[] swap = old_display;
-		old_display = display;
-		display = swap;
-		
-		/// debug printout
-		/*
-		System.out.println(disp);
-		if (startTime != 0) {
-			long time = (System.nanoTime() - startTime);
-			System.out.println("Ticks: " + ticks + " in ms: " + time/1000000 + ", ns/tick: " + (time/ticks));
-		}
-		startTime = System.nanoTime();
-		ticks = 0;
-		*/
+        this.mode = mode;
     }
 
-	/// long startTime=0;
-    /// int ticks = 0;
-
-
-    public final void enable(boolean en)
-    {
-        enabled = en;
+    public int getMode() {
+    	return mode;
     }
-
-    public final void set_mode(int mod)
-    {
-        mode = mod;
-    }
-
+    
     public final void keypad(int key)
     {
         if (btnpressed != 0)
@@ -68,32 +21,16 @@ public class Emulator extends Thread
         btnpressed = key;
     }
 
-    MainActivity mainActivity;
-    public Emulator(MainActivity mainActivity)
+    public Emulator()
     {
-    		this.mainActivity = mainActivity;
-    		set_mode(mainActivity.mode);
-    		
-            enabled=false;
-
-            ik1302 = new MCU(); // "IK1302"
-            ik1303 = new MCU(); // "IK1303"
-            ik1306 = new MCU(); // "IK1306"
+            ik1302 = new MCU();
+            ik1303 = new MCU();
+            ik1306 = new MCU();
+            
             ir2_1 = new Memory();
             ir2_2 = new Memory();
 
-            //load memory
-            ik1302.ucrom = UCommands.ik1302_urom;
-            ik1303.ucrom = UCommands.ik1303_urom;
-            ik1306.ucrom = UCommands.ik1306_urom;
-
-            ik1302.asprom = Synchro.ik1302_srom;
-            ik1303.asprom = Synchro.ik1303_srom;
-            ik1306.asprom = Synchro.ik1306_srom;
-
-            ik1302.cmdrom = MCommands.ik1302_mrom;
-            ik1303.cmdrom = MCommands.ik1303_mrom;
-            ik1306.cmdrom = MCommands.ik1306_mrom;
+            loadRom();
             
             ik1302.init();
             ik1303.init();
@@ -106,20 +43,40 @@ public class Emulator extends Thread
             btnpressed = 0;
     }
 
+    public void initTransient(MainActivity mainActivity) {
+    	this.mainActivity = mainActivity;
+    	state = 1;
+    	refSync   = new boolean[1];
+    	refSeg    = new byte[1];
+    	refDcycle = new int[1];
+        display = new byte[12];
+        oldDisplay = new byte[12];
+    	System.arraycopy(emptyDisplay, 0, oldDisplay, 0, emptyDisplay.length );
+    	displayString = new StringBuffer(24);
+    	loadRom();
+    }
+    
+    public final void stopEmulator()
+    {
+        this.state = 0;
+        while (state == 0)
+        	try { Thread.sleep(10); } catch (Exception e) {}
+    }
+
     public void run()
     {
         byte seg=0;
         int cycle;
         boolean grd=false;
 
-        //2 ms = real time
         while (true)
         {
+            //2 ms = real time
         	//// try { sleep(1); } catch (Exception e) {}
-            if(!enabled)
-            	return;
+            if(state != 1) // not running - exit now
+            	break;
             	
-            for(cycle = 0;cycle<168;cycle++)
+            for(cycle = 0; cycle<168; cycle++)
             {
                 k1 = false;
                 k2 = false;
@@ -153,16 +110,16 @@ public class Emulator extends Thread
                      }
                 }
 
-				tempRef_sync[0]   = sync;
-				tempRef_seg[0]    = seg;
-				tempRef_dcycle[0] = dcycle;
+				refSync[0]   = sync;
+				refSeg[0]    = seg;
+				refDcycle[0] = dcycle;
 
                 ///ticks++;
-                chain = ik1302.tick(chain, k1, k2, tempRef_dcycle, tempRef_sync, tempRef_seg);
+                chain = ik1302.tick(chain, k1, k2, refDcycle, refSync, refSeg);
 
-                sync   = tempRef_sync[0];
-                seg    = tempRef_seg[0];
-                dcycle = tempRef_dcycle[0];
+                sync   = refSync[0];
+                seg    = refSeg[0];
+                dcycle = refDcycle[0];
 
                 if(ik1302.strobe())
                 {
@@ -173,14 +130,15 @@ public class Emulator extends Thread
 
                     if(sync)
                     {
-                    	on_sync(display);
+                    	showOnDisplay();
                     }
                 }
                 else
                 {
                     if(sync)
                     {
-                    	on_sync(empty_display);
+                    	System.arraycopy(emptyDisplay, 0, display, 0, emptyDisplay.length );
+                    	showOnDisplay();
                     }
                 }
 
@@ -228,20 +186,71 @@ public class Emulator extends Thread
 
                 ik1302.pretick(chain);
             }
-        }
-
+        } // end-of-main-while-loop
+        state = -1; // stopped
     }
 
-	private boolean[] tempRef_sync   = new boolean[1];
-	private	byte[]    tempRef_seg    = new byte[1];
-	private int[]     tempRef_dcycle = new int[1];
+    // -------------------------------- Private methods ---------------------------------
+    private final void showOnDisplay()
+    {
+        if (Arrays.equals(oldDisplay, display))
+        	return;
 
-    private static final char[] segments = {'0','1','2','3','4','5','6','7','8','9','-','L','C','D','E',' '};
-   	private static final byte[] empty_display = {0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF};
-    private byte[] display = new byte[12];
-    private byte[] old_display = new byte[12];
-    private StringBuffer disp = new StringBuffer(24);
+		int i;
 
+		displayString.setLength(0);
+		for(i = 0; i<9; i++)
+		{
+			displayString.append(segments[display[8-i]&0xf]);
+			if((display[8-i]&0x80) != 0)
+			{
+				displayString.append('.');
+			}
+		}
+		for(i = 0;i<3;i++)
+		{
+			displayString.append(segments[display[11-i]&0xf]);
+			if((display[11-i]&0x80) != 0)
+			{
+				displayString.append('.');
+			}
+		}
+
+		mainActivity.setDisplay(displayString.toString());
+		
+		byte[] swap = oldDisplay;
+		oldDisplay = display;
+		display = swap;
+		
+		/// debug printout
+		/*
+		System.out.println(displayString);
+		if (startTime != 0) {
+			long time = (System.nanoTime() - startTime);
+			System.out.println("Ticks: " + ticks + " in ms: " + time/1000000 + ", ns/tick: " + (time/ticks));
+		}
+		startTime = System.nanoTime();
+		ticks = 0;
+		*/
+    }
+
+	/// long startTime=0;
+    /// int ticks = 0;
+
+    private void loadRom() {
+        ik1302.ucrom = UCommands.ik1302_urom;
+        ik1303.ucrom = UCommands.ik1303_urom;
+        ik1306.ucrom = UCommands.ik1306_urom;
+
+        ik1302.asprom = Synchro.ik1302_srom;
+        ik1303.asprom = Synchro.ik1303_srom;
+        ik1306.asprom = Synchro.ik1306_srom;
+
+        ik1302.cmdrom = MCommands.ik1302_mrom;
+        ik1303.cmdrom = MCommands.ik1303_mrom;
+        ik1306.cmdrom = MCommands.ik1306_mrom;
+    }
+    
     private MCU ik1302;
     private MCU ik1303;
     private MCU ik1306;
@@ -253,6 +262,18 @@ public class Emulator extends Thread
     private boolean k2;
     private int dcycle;
     private int btnpressed;
-    private int mode = 0; // 0=rad, 1=deg, 2=grd
-    private boolean enabled;
+    private int mode; // 0=rad, 1=deg, 2=grd
+    
+   	private transient MainActivity mainActivity;
+	private transient boolean[] refSync;
+	private	transient byte[]    refSeg;
+	private transient int[]     refDcycle;
+    private transient StringBuffer displayString;
+    private byte[] display = new byte[12];
+    private byte[] oldDisplay = new byte[12];
+    private transient int state; // 1=running, 0=stop
+
+    private static final char[] segments = {'0','1','2','3','4','5','6','7','8','9','-','L','C','D','E',' '};
+   	private static final byte[] emptyDisplay = {0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF};
+	private static final long serialVersionUID = 1L;
 }
