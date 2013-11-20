@@ -6,4 +6,12 @@
 
     <dimen name="indicator_font_size">48sp</dimen>
     
+    <dimen name="button_font_size_regular">25sp</dimen>
+    <dimen name="button_font_size_smaller">24sp</dimen>
+    <dimen name="button_font_size_smallest">16sp</dimen>
+    
+    <dimen name="label_font_size">14sp</dimen>
+    <dimen name="mk_label_font_size">14sp</dimen>
+    
+    <dimen name="button_radius">4dp</dimen>
 </resources>

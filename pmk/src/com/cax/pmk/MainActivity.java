@@ -27,17 +27,22 @@ import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
 	private static final String ANGLE_MODE_PREFERENCE_KEY = "angleMode";
 	private static final String SPEED_MODE_PREFERENCE_KEY = "speedMode";
+	private static final String MK_MODEL_PREFERENCE_KEY   = "mkModel";
 	private static final String PERSISTENCE_STATE_FILENAME = "persist";
     private static final String PERSISTENCE_STATE_EXTENSION = ".pmk";
     private static final int    EDIT_TEXT_ENTRY_ID = 12345;
@@ -52,10 +57,15 @@ public class MainActivity extends Activity {
 	private EmulatorInterface emulator = null;
 	private int angleMode = 0;
 	private int speedMode = 0;
+	private int mkModel = 0; // 0 for MK-61, 1 for MK-54
 	private TextView calculatorDisplay = null;
+	private Button mkModelButton = null;
+    private CheckBox powerOnOffCheckbox = null;
+    private int yellowLabelLeftPadding = 0;
 	private Vibrator vibrator = null;
 	private boolean  vibrate = true;
-		
+	private int calcNameTouchCounter = 0;
+	
     // ----------------------- Activity life cycle handlers --------------------------------
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,13 +73,14 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.activity_main_mk_61);
 
+        powerOnOffCheckbox = (CheckBox)findViewById(R.id.checkBoxPowerOnOff); 
+
         calculatorDisplay = (TextView) findViewById(R.id.textView_Indicator);
         Typeface tf = Typeface.createFromAsset(this.getAssets(), "fonts/digital-7-mod.ttf");
         calculatorDisplay.setTypeface(tf);
         calculatorDisplay.setText("");
 
-        ((TextView) findViewById(R.id.TextViewTableCellCalculatorName))
-        	.setText(getString(R.string.electronica) + "  " + getString(R.string.app_name));
+        yellowLabelLeftPadding = findViewById(R.id.label10powerX).getPaddingLeft();
         
         tf = Typeface.createFromAsset(this.getAssets(), "fonts/missing-symbols.ttf");
         ((TextView)findViewById(R.id.labelSquare))  .setTypeface(tf);
@@ -104,7 +115,10 @@ public class MainActivity extends Activity {
         angleMode = sharedPref.getInt(ANGLE_MODE_PREFERENCE_KEY, 0);
         setAngleModeRadios();
         
-    }
+        setMkModel(sharedPref.getInt(MK_MODEL_PREFERENCE_KEY,   0));
+
+        mkModelButton = (Button) findViewById(R.id.mk_model);
+	}
 
 	@Override
     public void onDestroy() {
@@ -113,6 +127,7 @@ public class MainActivity extends Activity {
     	SharedPreferences.Editor editor = sharedPref.edit();
     	editor.putInt(SPEED_MODE_PREFERENCE_KEY, speedMode);
     	editor.putInt(ANGLE_MODE_PREFERENCE_KEY, angleMode);
+    	editor.putInt(MK_MODEL_PREFERENCE_KEY,   mkModel);
     	editor.commit();
     	super.onDestroy();
 	}
@@ -139,9 +154,7 @@ public class MainActivity extends Activity {
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        //startActivity(new Intent(this, QuickPrefsActivity.class));
         return true;
     }
 
@@ -163,7 +176,33 @@ public class MainActivity extends Activity {
     }
     
     // ----------------------- UI call backs --------------------------------
-    // calculator indicator click callback
+    // calculator name touch callback
+    public void onCalculatorName(View view) {
+    	calcNameTouchCounter = (calcNameTouchCounter + 1) % 33;
+    	if (calcNameTouchCounter != 0) return; // act only on every 33th click - hidden feature !
+    	
+    	setMkModel(1 - mkModel);
+    	if (emulator != null)
+    		emulator.setMkModel(mkModel);
+    }
+
+    // calculator model button callback
+    public void onChooseMkModel(View view) {
+	    ContextThemeWrapper cw = new ContextThemeWrapper( this, R.style.AlertDialogTheme );
+		AlertDialog.Builder builder = new AlertDialog.Builder(cw);
+	
+		builder.setSingleChoiceItems(new String[] {getString(R.string.item_mk61), getString(R.string.item_mk54)}, mkModel, new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int item) {
+		    	setMkModel(item);
+				dialog.cancel();
+		    }
+		});
+
+		AlertDialog alert = builder.create();
+		alert.show();		
+	}
+
+    // calculator indicator touch callback
     public void onIndicator(View view) {
         if (emulator != null) {
         	emulator.setSpeedMode(1 - emulator.getSpeedMode());
@@ -174,8 +213,15 @@ public class MainActivity extends Activity {
 
     // calculator power switch callback
     public void onPower(View view) {
-    	switchOnCalculator(((CheckBox)view).isChecked());
     	if (vibrate) vibrator.vibrate(VIBRATE_ON_OFF_SWITCH);
+    	boolean isOn = ((CheckBox)view).isChecked();
+    	switchOnCalculator(isOn);
+    	setVisibilityMkModelChooser();
+    }
+    
+    void setVisibilityMkModelChooser() {
+    	boolean isOn = powerOnOffCheckbox.isChecked();
+    	mkModelButton.setVisibility(isOn ? View.INVISIBLE : View.VISIBLE);
     }
     
     // calculator mode switch callback
@@ -341,7 +387,7 @@ public class MainActivity extends Activity {
 			  return false;
 		} finally {
 	    	emulator = null;
-			try { if (out != null) out.close(); } catch(IOException i) {} 
+			try { if (out != null)         out.close(); } catch(IOException i) {} 
 			try { if (fileOut != null) fileOut.close(); } catch(IOException i) {}
 		}
     }
@@ -368,26 +414,106 @@ public class MainActivity extends Activity {
 	    } catch(Exception i) {
 			  return false;
 		} finally {
-			try { if (in != null) in.close(); } catch(IOException i) {} 
+			try { if (in != null)         in.close(); } catch(IOException i) {} 
 			try { if (fileIn != null) fileIn.close(); } catch(IOException i) {}
 		}
 
-    	if (emulator != null)
+    	if (emulator != null) {
     		emulator.stopEmulator();
-    		emulator = loadedEmulator;
+    	}
+    	
+    	emulator = loadedEmulator;
+    	emulator.initTransient(this);
 
-        	((CheckBox)findViewById(R.id.checkBoxPowerOnOff)).setChecked(true);
-        	angleMode = emulator.getAngleMode();
-        	speedMode = emulator.getSpeedMode();
-        	setAngleModeRadios();
-        	emulator.initTransient(this);
-        	setIndicatorColor();
-            emulator.start();
+    	angleMode = emulator.getAngleMode();
+    	speedMode = emulator.getSpeedMode();
+    	setAngleModeRadios();
 
-			return true;
+    	setMkModel(emulator.getMkModel());
+
+    	setIndicatorColor();
+
+    	powerOnOffCheckbox.setChecked(true);
+    	
+    	emulator.start();
+
+		setVisibilityMkModelChooser();
+
+		return true;
     }
 
     // ----------------------- Other --------------------------------
+	private static final int[] blueLabels = {
+		R.id.labelFloor,R.id.labelFrac,R.id.labelMax, 
+		R.id.labelAbs,R.id.labelSign,R.id.labelFromHM,R.id.labelToHM,
+		R.id.labelFromHMS,R.id.labelToHMS,R.id.labelRandom,
+		R.id.labelNOP,R.id.labelAnd,R.id.labelOr,R.id.labelXor,R.id.labelInv
+	};
+	
+	private static final CharSequence[] blueLabelsText = new CharSequence[blueLabels.length];
+    
+	private static final int[] pairedYellowLabels = {
+		R.id.labelSin,R.id.labelCos,R.id.labelTg,
+		R.id.labelArcSin,R.id.labelArcCos,R.id.labelArcTg,R.id.labelPi,
+		R.id.labelLn,R.id.labelXpowerY,R.id.labelBx,
+		R.id.label10powerX,R.id.labelDot,R.id.labelAVT,R.id.labelPRG,R.id.labelCF
+	};
+
+	void setMkModel(int mkModel) {
+		boolean doNothing = false;
+		if (mkModel == this.mkModel)
+			doNothing = true;
+
+        ((TextView) findViewById(R.id.TextViewTableCellCalculatorName))
+    	.setText(getString(R.string.electronica) + "  MK" + (mkModel==1 ? "-54" : " 61"));
+    	
+        if (doNothing) return;
+        
+    	if (mkModel == 1) { // 1 for MK-54, 0 for MK-61
+    		
+    		for (int i=0; i < blueLabels.length; i++) {
+
+	    		View modView = (TextView) findViewById(pairedYellowLabels[i]);
+	    		modView.setPadding(0, 0, 0, 0);
+
+		    	LayoutParams params = (LayoutParams) modView.getLayoutParams();
+		    	params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+		    	params.addRule(RelativeLayout.CENTER_IN_PARENT);
+
+		    	findViewById(pairedYellowLabels[i]).setPadding(0, 0, 0, 0);
+
+		    	TextView blueLabel = (TextView) findViewById(blueLabels[i]);
+		    	blueLabelsText[i] = blueLabel.getText(); 
+		    	blueLabel.setText("");
+    		}
+		    
+    		((TextView) findViewById(R.id.labelE)).setText("");
+    		((TextView) findViewById(R.id.labelNop54)).setText("НОП");
+    		((Button)findViewById(R.id.buttonClear)).setText("Cx");
+    		
+    	} else {
+
+    		for (int i=0; i < blueLabels.length; i++) {
+	    		View modView = (TextView) findViewById(pairedYellowLabels[i]);
+	    		modView.setPadding(yellowLabelLeftPadding, 0, 0, 0);
+
+		    	LayoutParams params = (LayoutParams) modView.getLayoutParams();
+		    	params.addRule(RelativeLayout.CENTER_IN_PARENT, 0);
+		    	params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+
+
+		    	TextView blueLabel = (TextView) findViewById(blueLabels[i]);
+		    	blueLabel.setText(blueLabelsText[i]);
+    		}
+
+    		((TextView) findViewById(R.id.labelE)).setText("e");
+    		((TextView) findViewById(R.id.labelNop54)).setText("");
+    		((Button)findViewById(R.id.buttonClear)).setText("CX");
+    	}
+    	
+    	this.mkModel = mkModel;
+    }
+		
     private void setAngleModeRadios() {
     	((RadioButton)findViewById(R.id.radioRadians)).setChecked(angleMode==0);
     	((RadioButton)findViewById(R.id.radioDegrees)).setChecked(angleMode==1);
@@ -411,12 +537,13 @@ public class MainActivity extends Activity {
     
     private void switchOnCalculator(boolean enable) {
     	if (enable) {
-    		if (((CheckBox)findViewById(R.id.checkBoxPowerOnOff)).isChecked()) {
+    		if (powerOnOffCheckbox.isChecked()) {
 	            emulator = useFelixCode 
 	            		? new com.cax.pmk.felix.Emulator()
 	            		: new com.cax.pmk.emulator.Emulator();
 	    		emulator.setAngleMode(angleMode);
 	    		emulator.setSpeedMode(speedMode);
+	    		emulator.setMkModel(mkModel);
 	    		emulator.initTransient(this);
 	        	setIndicatorColor();
 	            emulator.start();
@@ -427,7 +554,7 @@ public class MainActivity extends Activity {
     			emulator = null;
     		}
             calculatorDisplay.setText("");
-            ((CheckBox)findViewById(R.id.checkBoxPowerOnOff)).setChecked(false);
+            powerOnOffCheckbox.setChecked(false);
             //erase persistence file
             File file = getFileStreamPath(getSlotFilename(-1));
             if (file.exists())

@@ -26,6 +26,8 @@ public class Emulator extends Thread implements EmulatorInterface
     public int getAngleMode() { return mode; }
 	public final void setSpeedMode(int mode) { }
     public int getSpeedMode() { return 0; }
+	public final void setMkModel(int model) { }
+    public int getMkModel() { return 0; }
 	public final void setSaveStateName(String name) { }
     public String getSaveStateName() { return null; }
     

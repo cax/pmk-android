@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="electronica">Электроника</string>
-    <string name="app_name">MK 61</string>
+    <string name="app_name">MK 61/54</string>
 		
 	<!-- Messages for i18n -->
 	<string name="menu_load">Load</string>
@@ -27,15 +27,21 @@
 	<string name="msg_choose_slot">Choose slot to</string>
 	<string name="msg_save">save</string>
 	<string name="msg_load">load</string>
+
+	<string name="item_mk61">Elektronika MK 61 (MK 52 compatible excluding A↑ and ↑↓ functionality)</string>
+	<string name="item_mk54">Elektronika MK&#x2010;54 (compatible with Б3&#x2010;34, MK 56)</string>
+	
 	<string name="msg_about">
-	    \"Electronica {0}\" emulator\n
+	    Emulator of programmable\n
+	    calculators \"Elektronika\"\n
+	    models MK-61 and MK-54\n
 	    \n
 	    App developer:\n
 	    Stanislav Borutsky\n
 	    stanislavb@gmail.com\n
 	    \n
 	    Version:\n
-	    {1}\n
+	    {0}\n
 	    \n
 	    Based on emu145 project\n
 	    by Felix Lazarev\n
@@ -48,6 +54,8 @@
 	<string name="TextViewRadians">P</string>
 	<string name="TextViewDegrees">Г</string>
 	<string name="TextViewGrads">ГРД</string>
+	<string name="buttonChooseMkModel">▼</string>
+	<string name="indicatorTestString">&#x2010;9.8765432&#x2010;10</string>
 	
 	<string name="titleYellowColor">#FFFF00</string>
 	<string name="titleBlueColor">#0000FF</string>

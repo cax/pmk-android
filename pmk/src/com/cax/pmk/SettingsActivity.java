@@ -48,7 +48,7 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 		    
 		// set dialog message
-		alertDialogBuilder.setMessage(MessageFormat.format(getString(R.string.msg_about), getString(R.string.app_name), versionName));
+		alertDialogBuilder.setMessage(MessageFormat.format(getString(R.string.msg_about), versionName));
 		
 		alertDialogBuilder.setNegativeButton(getString(R.string.label_close), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {

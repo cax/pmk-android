@@ -175,7 +175,7 @@ public class MCU implements Externalizable
 	transient int[] ucmd_rom;
 	transient int[] cmd_rom;
 	transient int[] synchro_rom;
-	transient public int ik130x;
+	transient int ik130x;
 	
 	int[] R;
 	int[] M;

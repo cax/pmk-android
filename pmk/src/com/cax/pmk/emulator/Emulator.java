@@ -61,6 +61,14 @@ public class Emulator extends Thread implements EmulatorInterface
 		return speed_mode;
 	}
 
+	public void setMkModel(int model) {
+		this.mk_model = model;
+	}
+
+	public int getMkModel() {
+		return mk_model;
+	}
+
 	public void setSaveStateName(String name) {
 		saveStateName = name;
 	}
@@ -96,12 +104,17 @@ public class Emulator extends Thread implements EmulatorInterface
 	void tick() {
 		IK1302.in = IR2_2.out;		IK1302.tick();
 		IK1303.in = IK1302.out;		IK1303.tick();
-
 		
-		IK1306.in = IK1303.out;		IK1306.tick();
-		IR2_1.in  = IK1306.out;		IR2_1.tick();
-//		IR2_1.in  = IK1303.out;		IR2_1.tick();
-
+		if (mk_model == 1) 
+		{ // MK-54
+			IR2_1.in  = IK1303.out;		IR2_1.tick();
+		}
+		else 
+		{ // MK-61
+			IK1306.in = IK1303.out;		IK1306.tick();
+			IR2_1.in  = IK1306.out;		IR2_1.tick();
+		}
+		
 		IR2_2.in  = IR2_1.out;		IR2_2.tick();
 		IK1302.M[((IK1302.microtick >>> 2) + 41) % 42] = IR2_2.out;
 	}
@@ -153,6 +166,7 @@ public class Emulator extends Thread implements EmulatorInterface
 
 	private int angle_mode = 10; // R=10, GRD=11, G=12
 	private int speed_mode = 0;  // 0=fast, 1=real speed
+	private int mk_model   = 0;  // 0=MK-61, 1=MK-54
 	
 	private transient int[] indicator;
 	private transient int[] indicator_old;
@@ -182,7 +196,9 @@ public class Emulator extends Thread implements EmulatorInterface
    	   		IR2_1 = (Memory) objIn.readObject();
    	   		IR2_2 = (Memory) objIn.readObject();
    	   		angle_mode = objIn.readInt();
-   	   		speed_mode = objIn.readInt();
+   	   		int speed_mode_AND_mk_model = objIn.readInt();
+   	   		speed_mode = speed_mode_AND_mk_model & 255;
+   	   		mk_model = speed_mode_AND_mk_model >> 8;
    		} else {
    			throw new ClassNotFoundException();
    		}
@@ -198,6 +214,6 @@ public class Emulator extends Thread implements EmulatorInterface
    		objOut.writeObject(IR2_1);
    		objOut.writeObject(IR2_2);
    		objOut.writeInt(angle_mode);
-   		objOut.writeInt(speed_mode);
+   		objOut.writeInt(speed_mode | (mk_model << 8));
 	}
 }
