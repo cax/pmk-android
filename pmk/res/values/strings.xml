@@ -2,7 +2,6 @@
 <resources>
 
 <string name="app_name">MK 61</string>
-<string name="action_settings">Settings</string>
 
 <string name="checkBoxPowerOnOff">Вкл</string>
 <string name="TextViewRadians">P</string>

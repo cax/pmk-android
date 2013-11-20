@@ -1,3 +1,9 @@
+v1.3	(25 Aug 2013)
+
+ * added "About" dialog
+ * enlarged digits
+ * added state saving/loading (up to 50 slots)
+
 v1.2	(23 Aug 2013)
 
  * keep state after pressing Home or Back
