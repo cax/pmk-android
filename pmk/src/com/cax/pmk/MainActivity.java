@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -25,10 +27,12 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -64,6 +68,8 @@ public class MainActivity extends Activity {
 	private int mkModel = 0; // 0 for MK-61, 1 for MK-54
 
 	private int yellowLabelLeftPadding = 0;
+	private float buttonTextSize = 0;
+	private float labelTextSize = 0;
 	private boolean  vibrate = true;
 	private int calcNameTouchCounter = 0;
 
@@ -84,6 +90,10 @@ public class MainActivity extends Activity {
         // remember labels padding for later use
         yellowLabelLeftPadding = findViewById(R.id.label10powerX).getPaddingLeft();
         
+        // remember button and label text size for later use
+	    buttonTextSize = ((Button)  findViewById(R.id.buttonF    )).getTextSize();
+	    labelTextSize  = ((TextView)findViewById(R.id.labelSquare)).getTextSize();
+
         // remember vibrator service
         vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
         
@@ -105,16 +115,9 @@ public class MainActivity extends Activity {
         	((Button)findViewById(viewId)).setTypeface(tf, Typeface.NORMAL);
         }
         
-        // color buttons
-        findViewById(R.id.buttonF)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x00F5E345)); // yellow
-        findViewById(R.id.buttonK)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x0071E3FF)); // blue
-        findViewById(R.id.buttonClear).getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);            // red
+        // scale buttons text
+        scaleButtonsTextSize();
         
-        for (int button: new int[] { R.id.buttonStepForward, R.id.buttonStepBack,    R.id.buttonReturn, R.id.buttonStopStart,
-    		    					 R.id.buttonRegisterToX, R.id.buttonXToRegister, R.id.buttonGoto,   R.id.buttonSubroutine }) {
-        	findViewById(button).getBackground().setColorFilter(new LightingColorFilter(0,0)); // black
-        }
-
         // preferences initialization
         PreferenceManager.setDefaultValues(this, R.layout.preferences, false);
         activateSettings();
@@ -505,7 +508,39 @@ public class MainActivity extends Activity {
     }
 
     // ----------------------- Other --------------------------------
-	private static final int[] blueLabels = {
+    void scaleButtonsTextSize() {
+	    float smallerButtonTextSize = (float) (buttonTextSize * 0.95);
+	    ((Button)findViewById(R.id.buttonReturn   )).setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerButtonTextSize);
+	    ((Button)findViewById(R.id.buttonStopStart)).setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerButtonTextSize);
+
+	    List<View> list = getAllChildrenBFS(findViewById(R.id.tableLayoutKeyboard));
+	    for (int i=0; i < list.size(); i++) {
+	    	if (list.get(i) instanceof Button) {
+	    		((Button)list.get(i)).setTextSize(TypedValue.COMPLEX_UNIT_PX, buttonTextSize);
+	    	} else if (list.get(i) instanceof TextView) {
+	    		((TextView)list.get(i)).setTextSize(TypedValue.COMPLEX_UNIT_PX, labelTextSize);
+	    	}
+	    }
+    }
+    
+    private List<View> getAllChildrenBFS(View v) {
+        List<View> visited = new ArrayList<View>();
+        List<View> unvisited = new ArrayList<View>();
+        unvisited.add(v);
+
+        while (!unvisited.isEmpty()) {
+            View child = unvisited.remove(0);
+            visited.add(child);
+            if (!(child instanceof ViewGroup)) continue;
+            ViewGroup group = (ViewGroup) child;
+            final int childCount = group.getChildCount();
+            for (int i=0; i<childCount; i++) unvisited.add(group.getChildAt(i));
+        }
+
+        return visited;
+    }
+    
+    private static final int[] blueLabels = {
 		R.id.labelFloor,	R.id.labelFrac,	R.id.labelMax, 
 		R.id.labelAbs,		R.id.labelSign,	R.id.labelFromHM,	R.id.labelToHM,
 											R.id.labelFromHMS,	R.id.labelToHMS,R.id.labelRandom,

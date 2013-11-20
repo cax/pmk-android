@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:padding="0dip" >
 
-            <TextView
+            <com.cax.pmk.AutoScaleTextView
                 android:id="@+id/TextViewTableCellCalculatorName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
                 android:clickable="true"
                 android:onClick="onCalculatorName"
                 android:text="@string/electronica"
-                android:textSize="@dimen/mk_label_font_size" />
+                android:textSize="14sp" />
 	
             <TextView
                 android:id="@+id/TextViewGrads"
@@ -180,7 +180,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_yellow"
                 android:onClick="onButton"
                 android:tag="39"
                 android:text="@string/buttonF"
@@ -210,7 +210,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_black"
                 android:onClick="onButton"
                 android:tag="35"
                 android:text="@string/buttonStepForward"
@@ -239,7 +239,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_black"
                 android:onClick="onButton"
                 android:tag="37"
                 android:text="@string/buttonStepBack"
@@ -268,13 +268,13 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_black"
                 android:onClick="onButton"
                 android:tag="32"
                 android:text="@string/buttonReturn"
                 android:textColor="@color/whiteColor"
                 android:textColorHint="@color/whiteColor"
-                android:textSize="@dimen/button_font_size_smaller"
+                android:textSize="@dimen/button_font_size_regular"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -297,13 +297,13 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_black"
                 android:onClick="onButton"
                 android:tag="30"
                 android:text="@string/buttonStopStart"
                 android:textColor="@color/whiteColor"
                 android:textColorHint="@color/whiteColor"
-                android:textSize="@dimen/button_font_size_smaller"
+                android:textSize="@dimen/button_font_size_regular"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -337,7 +337,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_blue"
                 android:onClick="onButton"
                 android:tag="38"
                 android:text="@string/buttonK"
@@ -366,7 +366,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_black"
                 android:onClick="onButton"
                 android:tag="36"
                 android:text="@string/buttonRegisterToX"
@@ -395,7 +395,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_black"
                 android:onClick="onButton"
                 android:tag="34"
                 android:text="@string/buttonXToRegister"
@@ -424,7 +424,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_black"
                 android:onClick="onButton"
                 android:tag="31"
                 android:text="@string/buttonGoto"
@@ -453,7 +453,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom|left"
-                android:background="@drawable/button"
+                android:background="@drawable/button_black"
                 android:onClick="onButton"
                 android:tag="33"
                 android:text="@string/buttonSubroutine"
@@ -1369,12 +1369,14 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
+                android:background="@drawable/button_red"
+                android:onClick="onButton"
                 android:tag="28"
                 android:text="@string/buttonClear"
                 android:textColor="@color/whiteColor"
                 android:textColorHint="@color/whiteColor"
-                android:textStyle="bold" android:textSize="@dimen/button_font_size_regular" />
+                android:textSize="@dimen/button_font_size_regular"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

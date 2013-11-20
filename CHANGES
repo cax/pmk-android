@@ -1,3 +1,10 @@
+v2.2	(24 Sep 2013)
+
+ * fixed UI scaling issue on normal-mdpi screens
+ * improved large-mdpi screens
+
+ * added thin border around buttons
+
 v2.1	(22 Sep 2013)
 
  * "MK 61 ↔ MK-54" button is now menu option (available when calculator is off)
