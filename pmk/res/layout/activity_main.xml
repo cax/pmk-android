@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:background="#444444" >
+        android:background="#000000"
+        android:onClick="onIndicator" >
 
         <TextView
             android:id="@+id/textView_Indicator"
@@ -20,17 +21,17 @@
             android:height="55dp"
             android:maxLines="1"
             android:paddingBottom="5dp"
-            android:paddingLeft="1dp"
-            android:paddingRight="1dp"
-            android:paddingTop="10dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="0dp"
+            android:paddingTop="12dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#77FF77"
-            android:textSize="55sp" />
+            android:textSize="48sp" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/LinearLayout_Switches"
+        android:id="@+id/linearLayout_Switches"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/linearLayout_Indicator"
@@ -51,7 +52,7 @@
         android:id="@+id/Textline1"
         android:layout_width="match_parent"
         android:layout_height="18dp"
-        android:layout_below="@+id/LinearLayout_Switches"
+        android:layout_below="@+id/linearLayout_Switches"
         android:layout_marginTop="0dp"
         android:background="@android:color/transparent"
         android:clickable="false"
@@ -682,7 +683,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/LinearLayout_Switches"
+        android:layout_alignTop="@+id/linearLayout_Switches"
         android:layout_marginRight="36dp"
         android:orientation="horizontal"
         android:paddingTop="3dp" >

@@ -1,24 +1,37 @@
-package com.cax.pmk;
+package com.cax.pmk.felix;
 
-import java.io.Serializable;
+import java.io.*;
+import com.cax.pmk.*;
 import java.util.Arrays;
 
-public class Emulator extends Thread implements Serializable
+public class Emulator extends Thread implements EmulatorInterface
 {
-    public final void setMode(int mode)
-    {
-        this.mode = mode;
-    }
+	private transient static MCU.ucmd_u[] ik1302_ucrom; 
+	private transient static MCU.ucmd_u[] ik1303_ucrom; 
+	private transient static MCU.ucmd_u[] ik1306_ucrom; 
 
-    public int getMode() {
-    	return mode;
-    }
+	static { 
+    	ik1302_ucrom = new MCU.ucmd_u[68];
+    	ik1303_ucrom = new MCU.ucmd_u[68];
+    	ik1306_ucrom = new MCU.ucmd_u[68];
+
+    	for (int i=0; i < 68; i++) {
+            ik1302_ucrom[i] = new MCU.ucmd_u(UCommands.ik1302_urom[i]);
+    	    ik1303_ucrom[i] = new MCU.ucmd_u(UCommands.ik1303_urom[i]);
+    	    ik1306_ucrom[i] = new MCU.ucmd_u(UCommands.ik1306_urom[i]);
+    	}
+	}
+	
+	public final void setAngleMode(int mode) { this.mode = mode; }
+    public int getAngleMode() { return mode; }
+	public final void setSpeedMode(int mode) { }
+    public int getSpeedMode() { return 0; }
     
-    public final void keypad(int key)
+    public final void keypad(int keycode)
     {
         if (btnpressed != 0)
             return; //already processing one
-        btnpressed = key;
+        btnpressed = keycode = (keycode / 10) * 256 + keycode % 10;
     }
 
     public Emulator()
@@ -206,6 +219,10 @@ public class Emulator extends Thread implements Serializable
 			{
 				displayString.append('.');
 			}
+			else
+			{
+				displayString.append('/');
+			}
 		}
 		for(i = 0;i<3;i++)
 		{
@@ -213,6 +230,10 @@ public class Emulator extends Thread implements Serializable
 			if((display[11-i]&0x80) != 0)
 			{
 				displayString.append('.');
+			}
+			else
+			{
+				displayString.append('/');
 			}
 		}
 
@@ -238,10 +259,10 @@ public class Emulator extends Thread implements Serializable
     /// int ticks = 0;
 
     private void loadRom() {
-        ik1302.ucrom = UCommands.ik1302_urom;
-        ik1303.ucrom = UCommands.ik1303_urom;
-        ik1306.ucrom = UCommands.ik1306_urom;
-
+    	ik1302.ucrom = ik1302_ucrom;
+    	ik1303.ucrom = ik1303_ucrom;
+    	ik1306.ucrom = ik1306_ucrom;
+    	
         ik1302.asprom = Synchro.ik1302_srom;
         ik1303.asprom = Synchro.ik1303_srom;
         ik1306.asprom = Synchro.ik1306_srom;
@@ -276,4 +297,16 @@ public class Emulator extends Thread implements Serializable
     private static final char[] segments = {'0','1','2','3','4','5','6','7','8','9','-','L','C','D','E',' '};
    	private static final byte[] emptyDisplay = {0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF, 0xF};
 	private static final long serialVersionUID = 1L;
+
+	@Override
+	public void readExternal(ObjectInput arg0) throws IOException,
+			ClassNotFoundException {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void writeExternal(ObjectOutput arg0) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
 }

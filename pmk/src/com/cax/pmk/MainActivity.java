@@ -13,11 +13,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -26,9 +28,10 @@ public class MainActivity extends Activity {
     private static final String PERSISTENCE_STATE_FILENAME = "persist";
     private static final String PERSISTENCE_STATE_EXTENSION = ".pmk";
 	private static final int    SAVE_SLOTS_NUMBER = 50;
-    private int selectedSaveSlot = 0;
+	private static final boolean useFelixCode = false;
+	private int selectedSaveSlot = 0;
     private int tempSaveSlot = 0;
-	private Emulator emulator = null;
+	private EmulatorInterface emulator = null;
 	private int mode = 0;
 	private TextView calculatorDisplay = null;
 		
@@ -37,10 +40,12 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         calculatorDisplay = (TextView) findViewById(R.id.textView_Indicator);
         Typeface tf = Typeface.createFromAsset(this.getAssets(), "fonts/digital-7-mod.ttf");
         calculatorDisplay.setTypeface(tf);
-    }
+
+	}
 
     @Override
     public void onStart() {
@@ -82,7 +87,15 @@ public class MainActivity extends Activity {
     }
     
     // ----------------------- UI callbacks --------------------------------
-	// calculator power switch callback
+    // calculator indicator click callback
+    public void onIndicator(View view) {
+        if (emulator != null) {
+        	emulator.setSpeedMode(1 - emulator.getSpeedMode());
+        }
+    	setIndicatorColor();
+    }
+
+    // calculator power switch callback
     public void onPower(View view) {
     	switchOnCalculator(((CheckBox)view).isChecked());
     }
@@ -91,19 +104,17 @@ public class MainActivity extends Activity {
     public void onMode(View view) {
         mode = Integer.parseInt((String)view.getTag());
         if (emulator != null)
-        	emulator.setMode(mode);
+        	emulator.setAngleMode(mode);
     }
 
     // calculator button press callback
     public void onButton(View view) {
-    	int keycode = Integer.parseInt((String)view.getTag());
-        keycode = (keycode / 10) * 256 + keycode % 10;
-        ///System.out.println("Tag: " + view.getTag() + ", keycode=" + keycode);
-
     	if (emulator == null)
     		return;
     	
+    	int keycode = Integer.parseInt((String)view.getTag());
     	emulator.keypad(keycode);
+
     }
     
     // Show string on calculator display 
@@ -118,16 +129,14 @@ public class MainActivity extends Activity {
     }
 
     // ----------------------- Dialogs --------------------------------
-	private void chooseAndUseSaveSlot(final boolean save) {
+    private void chooseAndUseSaveSlot(final boolean save) {
 		if (save & emulator == null) // disable saving when calculator is switched off
 			return;
 		
 	    final CharSequence[] items = new CharSequence[SAVE_SLOTS_NUMBER];
 	    for (int i=0; i < SAVE_SLOTS_NUMBER; i++) {
-	    	String i_str = "0" + (i+1);
-    		items[i] = "Slot " + i_str.substring(i_str.length()-2)
-    				+ (getFileStreamPath(getSlotFilename(i)).exists() ? "" : " (empty)");
-	    }
+    		items[i] = getSlotDisplayName(i);
+    	}
 	
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Choose slot to " + (save ? "save" : "load"));
@@ -202,7 +211,37 @@ public class MainActivity extends Activity {
     }
 
 	// ----------------------- Save/Load emulator state --------------------------------
-    String getSlotFilename(int slotNumber) {
+    private String getSlotDisplayName(int i) {
+    	String filename = getSlotFilename(i);
+    	String i_str = "0" + (i+1);
+    	String slotName = "Slot " + i_str.substring(i_str.length()-2);
+    	if (!getFileStreamPath(getSlotFilename(i)).exists()) {
+    		slotName = slotName + " (empty)";
+    	} else {
+			FileInputStream fileIn = null;
+			ObjectInputStream in = null;
+	
+			try {
+				fileIn = openFileInput(filename);
+				in = new ObjectInputStream(fileIn);
+				com.cax.pmk.emulator.Emulator.readStateNamesMode = true;
+				com.cax.pmk.emulator.Emulator emulatorObjForStateNameOnly = (com.cax.pmk.emulator.Emulator) in.readObject();
+				if (emulatorObjForStateNameOnly.saveStateName != null && emulatorObjForStateNameOnly.saveStateName.length() > 0)
+					slotName = emulatorObjForStateNameOnly.saveStateName;
+				in.close();
+				fileIn.close();
+		    } catch(Exception e) {
+		    	e.printStackTrace();
+			} finally {
+				com.cax.pmk.emulator.Emulator.readStateNamesMode = false;
+				try { if (in != null) in.close(); } catch(IOException e) {} 
+				try { if (fileIn != null) fileIn.close(); } catch(IOException e) {}
+			}
+    	}
+    	return slotName;
+    }
+	
+	String getSlotFilename(int slotNumber) {
     	String filename;
     	if (slotNumber < 0)
     		filename = PERSISTENCE_STATE_FILENAME;
@@ -242,44 +281,61 @@ public class MainActivity extends Activity {
     	if (! getFileStreamPath(filename).exists())
     		return false;
     	
-    	if (emulator != null)
-    		emulator.stopEmulator();
-    		emulator = null;
-
 		FileInputStream fileIn = null;
 		ObjectInputStream in = null;
 
+		EmulatorInterface loadedEmulator = null;
 		try {
 			fileIn = openFileInput(filename);
 			in = new ObjectInputStream(fileIn);
-			emulator = (Emulator) in.readObject();
+			loadedEmulator = useFelixCode 
+            		? (com.cax.pmk.felix.Emulator)    in.readObject()
+            		: (com.cax.pmk.emulator.Emulator) in.readObject();
 			in.close();
 			fileIn.close();
 			
-        	((CheckBox)findViewById(R.id.checkBoxPowerOnOff)).setChecked(true);
-        	mode = emulator.getMode();
-        	((RadioButton)findViewById(R.id.radioRadians)).setChecked(mode==0);
-        	((RadioButton)findViewById(R.id.radioDegrees)).setChecked(mode==1);
-        	((RadioButton)findViewById(R.id.radioGrads))  .setChecked(mode==2);
-    		emulator.initTransient(this);
-            emulator.start();
-
-			return true;
 	    } catch(Exception i) {
 			  return false;
 		} finally {
 			try { if (in != null) in.close(); } catch(IOException i) {} 
 			try { if (fileIn != null) fileIn.close(); } catch(IOException i) {}
 		}
+
+    	if (emulator != null)
+    		emulator.stopEmulator();
+    		emulator = loadedEmulator;
+
+        	((CheckBox)findViewById(R.id.checkBoxPowerOnOff)).setChecked(true);
+        	mode = emulator.getAngleMode();
+        	((RadioButton)findViewById(R.id.radioRadians)).setChecked(mode==0);
+        	((RadioButton)findViewById(R.id.radioDegrees)).setChecked(mode==1);
+        	((RadioButton)findViewById(R.id.radioGrads))  .setChecked(mode==2);
+        	emulator.initTransient(this);
+        	setIndicatorColor();
+            emulator.start();
+
+			return true;
     }
 
     // ----------------------- Other --------------------------------
+    private void setIndicatorColor() {
+    	String color = "#000000";
+    	if (emulator != null) {
+    		color = emulator.getSpeedMode() == 0 ? "#444444" : "#001500";
+    	}
+    	((LinearLayout)findViewById(R.id.linearLayout_Indicator))
+    			.setBackgroundColor(Color.parseColor(color));
+    }
+    
     private void switchOnCalculator(boolean enable) {
     	if (enable) {
     		if (((CheckBox)findViewById(R.id.checkBoxPowerOnOff)).isChecked()) {
-	            emulator = new Emulator();
-	    		emulator.setMode(mode);
+	            emulator = useFelixCode 
+	            		? new com.cax.pmk.felix.Emulator()
+	            		: new com.cax.pmk.emulator.Emulator();
+	    		emulator.setAngleMode(mode);
 	    		emulator.initTransient(this);
+	        	setIndicatorColor();
 	            emulator.start();
     		}
     	} else {
@@ -293,6 +349,7 @@ public class MainActivity extends Activity {
             File file = getFileStreamPath(getSlotFilename(-1));
             if (file.exists())
             	file.delete();
+            setIndicatorColor();
     	}
     }
 }

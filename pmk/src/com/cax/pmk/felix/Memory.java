@@ -1,4 +1,4 @@
-package com.cax.pmk;
+package com.cax.pmk.felix;
 
 import java.io.Serializable;
 

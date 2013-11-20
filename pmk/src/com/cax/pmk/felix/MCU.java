@@ -1,4 +1,4 @@
-package com.cax.pmk;
+package com.cax.pmk.felix;
 
 import java.io.Serializable;
 
@@ -101,9 +101,9 @@ public class MCU implements Serializable
             ucmd+=0x3c;
         }
         
-        init_ucmd(ucrom[ucmd]);
+        ucmd_u c = ucrom[ucmd];
 
-        switch(s1)
+        switch(c.s1)
         {
             case 2:
                 rh[0] = ((((k2?1:0)<<3|(k1?1:0))>>ucount)&1)>0;
@@ -120,7 +120,7 @@ public class MCU implements Serializable
             latchk1 = k1;
             latchk2 = k2;
         }
-        if(g_nt)
+        if(c.g_nt)
         {
             was_t_qrd = true;
         }
@@ -135,83 +135,83 @@ public class MCU implements Serializable
         }
 
         {
-            if(g_nt | was_t_qrd)
+            if(c.g_nt | was_t_qrd)
             {
                 rs1[0] = ((((latchk2?1:0)<<3|(latchk1?1:0))>>ucount)&1)>0?true:false;
             }
         }
 
-        if(a_r)
+        if(c.a_r)
         {
             a|=rr[rrIx]?1:0;
         }
 
-        if(a_m)
+        if(c.a_m)
         {
             a|=rm[rmIx]?1:0;
         }
 
-        if(a_st)
+        if(c.a_st)
         {
             a|=rst[rstIx]?1:0;
         }
 
-        if(a_nr)
+        if(c.a_nr)
         {
             a|=(!rr[rrIx])?1:0;
         }
 
-        if(a_10nl)
+        if(c.a_10nl)
         {
             a|=((10>>ucount)&1) & ((!rl)?1:0);
         }
 
-        if(a_s)
+        if(c.a_s)
         {
             a|=rs[0]?1:0;
         }
 
-        if(a_4)
+        if(c.a_4)
         {
             a|=((4>>ucount)&1);
         }
 
-        if(b_1)
+        if(c.b_1)
         {
             b|=((1>>ucount)&1);
         }
 
-        if(b_6)
+        if(c.b_6)
         {
             b|=((6>>ucount)&1);
         }
 
-        if(b_s)
+        if(c.b_s)
         {
             b|=rs[0]?1:0;
         }
 
-        if(b_s1)
+        if(c.b_s1)
         {
             b|=rs1[0]?1:0;
         }
 
-        if(b_ns)
+        if(c.b_ns)
         {
             b|=(!rs[0])?1:0;
         }
 
-        if(g_l)
+        if(c.g_l)
         {
             g|=rl?1:0;
         }
 
-        if(g_nl)
+        if(c.g_nl)
         {
             g|=(!rl)?1:0;
         }
 
-        if(g_nt)
+        if(c.g_nt)
         {
              g|=(!rt)?1:0;
         }
@@ -225,7 +225,7 @@ public class MCU implements Serializable
         carry = ((sigma>>>1)&1)>0?true:false;
         sigma&=1;
 
-        switch(r0)
+        switch(c.r0)
         {
             case 0:
                 newr0 = rr[rrIx]?1:0;
@@ -252,7 +252,7 @@ public class MCU implements Serializable
                 newr0 = rr[rrIx]?1:0|sigma;
                 break;
         }
-        if(r_1)
+        if(c.r_1)
         {
             if(icount<36)
             {
@@ -266,7 +266,7 @@ public class MCU implements Serializable
                 rr[getRrIx(MCU_BITLEN-4)] = sigma!=0;
             }
         }
-        if(r_2)
+        if(c.r_2)
         {
             if(icount<36)
             {
@@ -281,7 +281,7 @@ public class MCU implements Serializable
             }
 
         }
-        if(l)
+        if(c.l)
         {
             if(ucount == 3)
             {
@@ -289,7 +289,7 @@ public class MCU implements Serializable
             }
         }
 
-        if(m)
+        if(c.m)
         {
             newm0 = rs[0]?1:0;
         }
@@ -298,7 +298,7 @@ public class MCU implements Serializable
             newm0 = rm[rmIx]?1:0;
         }
 
-        switch(s)
+        switch(c.s)
         {
             case 0:
                 temp = rs[0];
@@ -328,7 +328,7 @@ public class MCU implements Serializable
                 break;
         }
 
-        switch(s1)
+        switch(c.s1)
         {
             case 0:
                 temp = rs1[0];
@@ -364,7 +364,7 @@ public class MCU implements Serializable
 		rstIx4 = (rstIx + 4) % MCU_BITLEN;
 		rstIx8 = (rstIx + 8) % MCU_BITLEN;
 
-        switch(st)
+        switch(c.st)
         {
             case 1:
                 rst[rstIx8] = rst[rstIx4];
@@ -467,71 +467,72 @@ public class MCU implements Serializable
     }
 
     // ---------------------- ucmd_u start --------------------------------
-	public void init_ucmd(int u) {
-		 raw = u;
+    public static final class ucmd_u {
+	    public ucmd_u(int u) {
+			 raw = u;
+		
+			 a_r 	= (u & 1) > 0;
+			 a_m 	= ((u >>  1) & 1) > 0;
+			 a_st	= ((u >>  2) & 1) > 0;
+			 a_nr	= ((u >>  3) & 1) > 0;
+			 a_10nl	= ((u >>  4) & 1) > 0;
+			 a_s	= ((u >>  5) & 1) > 0;
+			 a_4	= ((u >>  6) & 1) > 0;
+			 b_s	= ((u >>  7) & 1) > 0;
+		
+			 b_ns	= ((u >>  8) & 1) > 0;
+			 b_s1	= ((u >>  9) & 1) > 0;
+			 b_6	= ((u >> 10) & 1) > 0;
+			 b_1	= ((u >> 11) & 1) > 0;
+			 g_l	= ((u >> 12) & 1) > 0;
+			 g_nl	= ((u >> 13) & 1) > 0;
+			 g_nt	= ((u >> 14) & 1) > 0;
+		
+			 r0		= (u >> 15) & 7;
+			 r_1	= ((u >> 18) & 1) > 0;
+			 r_2	= ((u >> 19) & 1) > 0;
+			 m		= ((u >> 20) & 1) > 0;
+			 l		= ((u >> 21) & 1) > 0;
+			 s		= (u >> 22) & 3;
+		
+			 s1		= (u >> 24) & 3;
+			 st		= (u >> 26) & 3;
+			 pad	= (u >> 28) & 15;
+	    }
 	
-		 a_r 	= (u & 1) > 0;
-		 a_m 	= ((u >>  1) & 1) > 0;
-		 a_st	= ((u >>  2) & 1) > 0;
-		 a_nr	= ((u >>  3) & 1) > 0;
-		 a_10nl	= ((u >>  4) & 1) > 0;
-		 a_s	= ((u >>  5) & 1) > 0;
-		 a_4	= ((u >>  6) & 1) > 0;
-		 b_s	= ((u >>  7) & 1) > 0;
-	
-		 b_ns	= ((u >>  8) & 1) > 0;
-		 b_s1	= ((u >>  9) & 1) > 0;
-		 b_6	= ((u >> 10) & 1) > 0;
-		 b_1	= ((u >> 11) & 1) > 0;
-		 g_l	= ((u >> 12) & 1) > 0;
-		 g_nl	= ((u >> 13) & 1) > 0;
-		 g_nt	= ((u >> 14) & 1) > 0;
-	
-		 r0		= (u >> 15) & 7;
-		 r_1	= ((u >> 18) & 1) > 0;
-		 r_2	= ((u >> 19) & 1) > 0;
-		 m		= ((u >> 20) & 1) > 0;
-		 l		= ((u >> 21) & 1) > 0;
-		 s		= (u >> 22) & 3;
-	
-		 s1		= (u >> 24) & 3;
-		 st		= (u >> 26) & 3;
-		 pad	= (u >> 28) & 15;
-	 }
-	
-	int raw;
-	
-	boolean a_r;
-	boolean a_m;
-	boolean a_st;
-	boolean a_nr;
-	boolean a_10nl;
-	boolean a_s;
-	boolean a_4;
-	boolean b_s;
-	
-	boolean b_ns;
-	boolean b_s1;
-	boolean b_6;
-	boolean b_1;
-	boolean g_l;
-	boolean g_nl;
-	boolean g_nt;
-	
-	int r0;
-	boolean r_1;
-	boolean r_2;
-	boolean m;
-	boolean l;
-	int s;
-	
-	int s1;
-	int st;
-	int pad;
-
+		int raw;
+		
+		boolean a_r;
+		boolean a_m;
+		boolean a_st;
+		boolean a_nr;
+		boolean a_10nl;
+		boolean a_s;
+		boolean a_4;
+		boolean b_s;
+		
+		boolean b_ns;
+		boolean b_s1;
+		boolean b_6;
+		boolean b_1;
+		boolean g_l;
+		boolean g_nl;
+		boolean g_nt;
+		
+		int r0;
+		boolean r_1;
+		boolean r_2;
+		boolean m;
+		boolean l;
+		int s;
+		
+		int s1;
+		int st;
+		int pad;
+    }
     // ---------------------- ucmd_u end --------------------------------
 
-    public int[]    ucrom = null;
+    public ucmd_u[] ucrom  = null;
     public byte[][] asprom = null;
     public int[]    cmdrom = null;
     public int dcount;
