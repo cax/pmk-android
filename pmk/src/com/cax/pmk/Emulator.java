@@ -4,9 +4,6 @@ import java.util.Arrays;
 
 public class Emulator extends Thread
 {
-	long startTime=0;
-    int ticks = 0;
-
     public final void on_sync(byte[] display)
     {
         if (Arrays.equals(old_display, display))
@@ -34,7 +31,12 @@ public class Emulator extends Thread
 
 		mainActivity.setDisplay(disp.toString());
 		
-		// debug printout
+		byte[] swap = old_display;
+		old_display = display;
+		display = swap;
+		
+		/// debug printout
+		/*
 		System.out.println(disp);
 		if (startTime != 0) {
 			long time = (System.nanoTime() - startTime);
@@ -42,11 +44,12 @@ public class Emulator extends Thread
 		}
 		startTime = System.nanoTime();
 		ticks = 0;
-		
-		byte[] swap = old_display;
-		old_display = display;
-		display = swap;
+		*/
     }
+
+	/// long startTime=0;
+    /// int ticks = 0;
+
 
     public final void enable(boolean en)
     {
@@ -71,8 +74,6 @@ public class Emulator extends Thread
     		this.mainActivity = mainActivity;
     		set_mode(mainActivity.mode);
     		
-            int i;
-            int j;
             enabled=false;
 
             ik1302 = new MCU(); // "IK1302"
@@ -82,29 +83,18 @@ public class Emulator extends Thread
             ir2_2 = new Memory();
 
             //load memory
-            for(i = 0;i<68;i++)
-            {
-                ik1302.ucrom[i] = UCommands.ik1302_urom[i];
-                ik1303.ucrom[i] = UCommands.ik1303_urom[i];
-                ik1306.ucrom[i] = UCommands.ik1306_urom[i];
-            }
-            for(i = 0;i<128;i++)
-            {
-                for(j = 0;j<9;j++)
-                {
-                    ik1302.asprom[i][j] = Synchro.ik1302_srom[i][j];
-                    ik1303.asprom[i][j] = Synchro.ik1303_srom[i][j];
-                    ik1306.asprom[i][j] = Synchro.ik1306_srom[i][j];
-                }
-		    }
+            ik1302.ucrom = UCommands.ik1302_urom;
+            ik1303.ucrom = UCommands.ik1303_urom;
+            ik1306.ucrom = UCommands.ik1306_urom;
 
-           for(i = 0;i<256;i++)
-            {
-                ik1302.cmdrom[i] = MCommands.ik1302_mrom[i];
-                ik1303.cmdrom[i] = MCommands.ik1303_mrom[i];
-                ik1306.cmdrom[i] = MCommands.ik1306_mrom[i];
-            }
+            ik1302.asprom = Synchro.ik1302_srom;
+            ik1303.asprom = Synchro.ik1303_srom;
+            ik1306.asprom = Synchro.ik1306_srom;
 
+            ik1302.cmdrom = MCommands.ik1302_mrom;
+            ik1303.cmdrom = MCommands.ik1303_mrom;
+            ik1306.cmdrom = MCommands.ik1306_mrom;
+            
             ik1302.init();
             ik1303.init();
             ik1306.init();
@@ -167,7 +157,7 @@ public class Emulator extends Thread
 				tempRef_seg[0]    = seg;
 				tempRef_dcycle[0] = dcycle;
 
-                ticks++;
+                ///ticks++;
                 chain = ik1302.tick(chain, k1, k2, tempRef_dcycle, tempRef_sync, tempRef_seg);
 
                 sync   = tempRef_sync[0];
@@ -229,9 +219,9 @@ public class Emulator extends Thread
                 }
 
                 chain = ik1303.tick(chain, grd,   false, null, null, null);
-                ticks++;
+                ///ticks++;
                 chain = ik1306.tick(chain, false, false, null, null, null);
-                ticks++;
+                ///ticks++;
 
                 chain = ir2_1.tick(chain);
                 chain = ir2_2.tick(chain);
