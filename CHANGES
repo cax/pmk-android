@@ -1,3 +1,12 @@
+v1.7	(12 Sep 2013)
+
+ * fixed ГРД angle mode switch position (was acting as Degrees mode instead of Grads)
+ * saved states now can have names. Hint: load and save state to rename it.
+ * use up to 99 saved states now instead of 50
+ * added Russian user interface translation
+ * a number of polishing UI tweaks on the main and settings screens
+
+
 v1.6	(03 Sep 2013)
 
  * added "Settings" page to let user choose vibration and/or disabled screen auto-off

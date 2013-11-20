@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="menu_load">Загрузить</string>
+	<string name="menu_save">Сохранить</string>
+	<string name="menu_settings">Настройки</string>
+	
+	<string name="settings_vibrate_title">Вибрировать</string>
+	<string name="settings_vibrate_summary">Тактильная обратная связь при нажатии на клавиши и переключатели</string>
+	<string name="settings_screen_always_on_title">Не отключать экран</string>
+	<string name="settings_screen_always_on_summary">Не затемнять и не выключать экран</string>
+	<string name="settings_about_title">О программе</string>
+
+	<string name="label_save">Сохранить</string>
+	<string name="label_load">Загрузить</string>
+	<string name="label_cancel">Отмена</string>
+	<string name="label_close">Закрыть</string>
+
+	<string name="savestate_name_slot">Слот</string>
+	<string name="savestate_name_empty">(свободен)</string>
+	<string name="savestate_name_noname">(без названия)</string>
+	
+	<string name="msg_choose_name">Введите название сохранения</string>
+	<string name="msg_choose_slot">Выберите слот для</string>
+	<string name="msg_save">сохранения</string>
+	<string name="msg_load">загрузки</string>
+	<string name="msg_about">
+	    Эмулятор \"Электроника {0}\"\n
+	    \n
+	    Разработчик аппликации:\n
+	    Станислав Боруцкий\n
+	    stanislavb@gmail.com\n
+	    \n
+	    Версия:\n
+	    {1}\n
+	    \n
+	    Эмуляция реализована на основе\n
+	    проекта emu145 Феликса Лазарева\n
+	    http://code.google.com/p/emu145\n
+	</string>
+</resources>

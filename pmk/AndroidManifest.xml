@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="com.cax.pmk"
-    android:versionCode="160"
-    android:versionName="1.6" xmlns:android="http://schemas.android.com/apk/res/android">
+    android:versionCode="170"
+    android:versionName="1.7" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -14,20 +14,26 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
         <activity
             android:name="com.cax.pmk.MainActivity"
             android:configChanges="orientation"
     		android:screenOrientation="portrait"
             android:theme="@style/Theme.FullScreen"
-            android:label="@string/app_name" >
+        >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
+                <action   android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         
-         <activity android:name=".SettingsActivity"></activity>
+         <activity android:name=".SettingsActivity"
+            android:configChanges="orientation"
+    		android:screenOrientation="portrait"
+            android:theme="@style/Theme.FullScreen"
+         >
+         </activity>
+
     </application>
 
 </manifest>

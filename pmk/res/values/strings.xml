@@ -1,142 +1,173 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-<string name="app_name">MK 61</string>
-
-<string name="menu_load">Load</string>
-<string name="menu_save">Save</string>
-<string name="menu_settings">Settings</string>
-
-<string name="settings_vibrate_title">Vibrate</string>
-<string name="settings_vibrate_summary">Enable haptic feedback for buttons and switches</string>
-<string name="settings_screen_always_on_title">Keep screen on</string>
-<string name="settings_screen_always_on_summary">Don\'t dim or switch display off</string>
-<string name="settings_about_title">About</string>
-
-<string name="checkBoxPowerOnOff">Вкл</string>
-<string name="TextViewRadians">P</string>
-<string name="TextViewDegrees">Г</string>
-<string name="TextViewGrads">ГРД</string>
-
-<string name="titleYellowColor">#FFFF00</string>
-<string name="titleBlueColor">#0000FF</string>
-<string name="textBlackColor">#000000</string>
-<string name="textWhiteColor">#FFFFFF</string>
-
-<!-- 1st row of buttons -->
-<string name="buttonF">F</string>
-
-<string name="buttonStepForward">ШГ→</string>
-<string name="buttonStepForwardYellow">x&lt;0</string>
-
-<string name="buttonStepBack">ШГ←</string>
-<string name="buttonStepBackYellow">x=0</string>
-
-<string name="buttonReturn">В/О</string>
-<string name="buttonReturnYellow">x≥0</string>
-
-<string name="buttonStopStart">С/П</string>
-<string name="buttonStopStartYellow">x≠0</string>
-
-<!-- 2nd row of buttons -->
-<string name="buttonK">K</string>
-
-<string name="buttonRegisterToX">П→X</string>
-<string name="buttonRegisterToXYellow">L0</string>
-
-<string name="buttonXToRegister">X→П</string>
-<string name="buttonXToRegisterYellow">L1</string>
-
-<string name="buttonGoto">БП</string>
-<string name="buttonGotoYellow">L2</string>
-
-<string name="buttonSubroutine">ПП</string>
-<string name="buttonSubroutineYellow">L3</string>
-
-<!-- 3rd row of buttons -->
-<string name="button7">7</string>
-<string name="button7Yellow">sin</string>
-<string name="button7Blue">[x]</string>
-
-<string name="button8">8</string>
-<string name="button8Yellow">cos</string>
-<string name="button8Blue">{x}</string>
-
-<string name="button9">9</string>
-<string name="button9Yellow">tg</string>
-<string name="button9Blue">max</string>
-
-<string name="buttonSubtract">–</string>
-<string name="buttonSubtractYellow">)</string> <!-- √ -->
-
-<string name="buttonDivide">÷</string>
-<string name="buttonDivideYellow">1/x</string>
-
-<!-- 4th row of buttons -->
-<string name="button4">4</string>
-<string name="button4Yellow">sin-¹</string>
-<string name="button4Blue">|x|</string>
-
-<string name="button5">5</string>
-<string name="button5Yellow">cos-¹</string>
-<string name="button5Blue">ЗН</string>
-
-<string name="button6">6</string>
-<string name="button6Yellow">tg-¹</string>
-<string name="button6Blue">←°\'</string>
-
-<string name="buttonAdd">+</string>
-<string name="buttonAddYellow">π</string>
-<string name="buttonAddBlue">→°\'</string>
-
-<string name="buttonMultiply">×</string>
-<string name="buttonMultiplyYellow">x²</string>
-
-<!-- 5th row of buttons -->
-<string name="button1">1</string>
-<string name="button1Yellow">%$</string> <!-- eⁿ -->
-
-<string name="button2">2</string>
-<string name="button2Yellow">lg</string>
-
-<string name="button3">3</string>
-<string name="button3Yellow">ln</string>
-<string name="button3Blue">←°\'\"</string>
-
-<string name="buttonExchangeXY">↔</string>
-<string name="buttonExchangeXYYellow">(&amp;</string> <!-- x^y -->
-<string name="buttonExchangeXYBlue">→°\'\"</string>
-
-<string name="buttonUpStack">В↑</string>
-<string name="buttonUpStackYellow">Bx</string>
-<string name="buttonUpStackBlue">СЧ</string>
-
-<!-- 6th row of buttons -->
-<string name="button0">0</string>
-<string name="button0Yellow">!#$</string> <!-- 10ⁿ -->
-<string name="button0Blue">НОП</string>
-
-<string name="buttonDot">•</string>
-<string name="buttonDotYellow">0</string> <!-- ○ -->
-<string name="buttonDotBlue">∧</string>
-
-<string name="buttonNegate">/–/</string>
-<string name="buttonNegateYellow">АВТ</string>
-<string name="buttonNegateBlue">∨</string>
-
-<string name="buttonOrderOfTen">ВП</string>
-<string name="buttonOrderOfTenYellow">ПРГ</string>
-<string name="buttonOrderOfTenBlue">⊕</string>
-
-<string name="buttonClear">CX</string>
-<string name="buttonClearYellow">CF</string>
-<string name="buttonClearBlue">ИНВ</string>
-
-<!-- under 6th row of buttons -->
-<string name="buttonLetterA">a</string>
-<string name="buttonLetterB">b</string>
-<string name="buttonLetterC">c</string>
-<string name="buttonLetterD">d</string>
-<string name="buttonLetterE">e</string>
-
+	<string name="electronica">Электроника</string>
+    <string name="app_name">MK 61</string>
+		
+	<!-- Messages for i18n -->
+	<string name="menu_load">Load</string>
+	<string name="menu_save">Save</string>
+	<string name="menu_settings">Settings</string>
+	
+	<string name="settings_vibrate_title">Vibrate</string>
+	<string name="settings_vibrate_summary">Enable haptic feedback for buttons and switches</string>
+	<string name="settings_screen_always_on_title">Keep screen on</string>
+	<string name="settings_screen_always_on_summary">Don\'t dim or switch display off</string>
+	<string name="settings_about_title">About</string>
+	
+	<string name="label_save">Save</string>
+	<string name="label_load">Load</string>
+	<string name="label_cancel">Cancel</string>
+	<string name="label_close">Close</string>
+	
+	<string name="savestate_name_slot">Slot</string>
+	<string name="savestate_name_empty">(empty)</string>
+	<string name="savestate_name_noname">(no name)</string>
+		
+	<string name="msg_choose_name">Enter save name</string>
+	<string name="msg_choose_slot">Choose slot to</string>
+	<string name="msg_save">save</string>
+	<string name="msg_load">load</string>
+	<string name="msg_about">
+	    \"Electronica {0}\" emulator\n
+	    \n
+	    App developer:\n
+	    Stanislav Borutsky\n
+	    stanislavb@gmail.com\n
+	    \n
+	    Version:\n
+	    {1}\n
+	    \n
+	    Based on emu145 project\n
+	    by Felix Lazarev\n
+	    http://code.google.com/p/emu145\n
+	</string>
+	
+	<!-- end of i18n messages -->
+	
+	<string name="checkBoxPowerOnOff">Вкл</string>
+	<string name="TextViewRadians">P</string>
+	<string name="TextViewDegrees">Г</string>
+	<string name="TextViewGrads">ГРД</string>
+	
+	<string name="titleYellowColor">#FFFF00</string>
+	<string name="titleBlueColor">#0000FF</string>
+	<string name="textBlackColor">#000000</string>
+	<string name="textWhiteColor">#FFFFFF</string>
+	
+	<!-- 1st row of buttons -->
+	<string name="buttonF">F</string>
+	
+	<string name="buttonStepForward">ШГ→</string>
+	<string name="buttonStepForwardYellow">x&lt;0</string>
+	
+	<string name="buttonStepBack">ШГ←</string>
+	<string name="buttonStepBackYellow">x=0</string>
+	
+	<string name="buttonReturn">В/О</string>
+	<string name="buttonReturnYellow">x≥0</string>
+	
+	<string name="buttonStopStart">С/П</string>
+	<string name="buttonStopStartYellow">x≠0</string>
+	
+	<!-- 2nd row of buttons -->
+	<string name="buttonK">K</string>
+	
+	<string name="buttonRegisterToX">П→X</string>
+	<string name="buttonRegisterToXYellow">L0</string>
+	
+	<string name="buttonXToRegister">X→П</string>
+	<string name="buttonXToRegisterYellow">L1</string>
+	
+	<string name="buttonGoto">БП</string>
+	<string name="buttonGotoYellow">L2</string>
+	
+	<string name="buttonSubroutine">ПП</string>
+	<string name="buttonSubroutineYellow">L3</string>
+	
+	<!-- 3rd row of buttons -->
+	<string name="button7">7</string>
+	<string name="button7Yellow">sin</string>
+	<string name="button7Blue">[x]</string>
+	
+	<string name="button8">8</string>
+	<string name="button8Yellow">cos</string>
+	<string name="button8Blue">{x}</string>
+	
+	<string name="button9">9</string>
+	<string name="button9Yellow">tg</string>
+	<string name="button9Blue">max</string>
+	
+	<string name="buttonSubtract">–</string>
+	<string name="buttonSubtractYellow">)</string> <!-- √ -->
+	
+	<string name="buttonDivide">÷</string>
+	<string name="buttonDivideYellow">1/x</string>
+	
+	<!-- 4th row of buttons -->
+	<string name="button4">4</string>
+	<string name="button4Yellow">sin-¹</string>
+	<string name="button4Blue">|x|</string>
+	
+	<string name="button5">5</string>
+	<string name="button5Yellow">cos-¹</string>
+	<string name="button5Blue">ЗН</string>
+	
+	<string name="button6">6</string>
+	<string name="button6Yellow">tg-¹</string>
+	<string name="button6Blue">←°\'</string>
+	
+	<string name="buttonAdd">+</string>
+	<string name="buttonAddYellow">π</string>
+	<string name="buttonAddBlue">→°\'</string>
+	
+	<string name="buttonMultiply">×</string>
+	<string name="buttonMultiplyYellow">x²</string>
+	
+	<!-- 5th row of buttons -->
+	<string name="button1">1</string>
+	<string name="button1Yellow">%$</string> <!-- eⁿ -->
+	
+	<string name="button2">2</string>
+	<string name="button2Yellow">lg</string>
+	
+	<string name="button3">3</string>
+	<string name="button3Yellow">ln</string>
+	<string name="button3Blue">←°\'\"</string>
+	
+	<string name="buttonExchangeXY">↔</string>
+	<string name="buttonExchangeXYYellow">(&amp;</string> <!-- x^y -->
+	<string name="buttonExchangeXYBlue">→°\'\"</string>
+	
+	<string name="buttonUpStack">BA</string> <!-- В↑ -->
+	<string name="buttonUpStackYellow">Bx</string>
+	<string name="buttonUpStackBlue">СЧ</string>
+	
+	<!-- 6th row of buttons -->
+	<string name="button0">0</string>
+	<string name="button0Yellow">!#$</string> <!-- 10ⁿ -->
+	<string name="button0Blue">НОП</string>
+	
+	<string name="buttonDot">•</string>
+	<string name="buttonDotYellow">0</string> <!-- ○ -->
+	<string name="buttonDotBlue">∧</string>
+	
+	<string name="buttonNegate">/–/</string>
+	<string name="buttonNegateYellow">АВТ</string>
+	<string name="buttonNegateBlue">∨</string>
+	
+	<string name="buttonOrderOfTen">ВП</string>
+	<string name="buttonOrderOfTenYellow">ПРГ</string>
+	<string name="buttonOrderOfTenBlue">⊕</string>
+	
+	<string name="buttonClear">CX</string>
+	<string name="buttonClearMK54">Cx</string>
+	<string name="buttonClearYellow">CF</string>
+	<string name="buttonClearBlue">ИНВ</string>
+	
+	<!-- under 6th row of buttons -->
+	<string name="buttonLetterA">a</string>
+	<string name="buttonLetterB">b</string>
+	<string name="buttonLetterC">c</string>
+	<string name="buttonLetterD">d</string>
+	<string name="buttonLetterE">e</string>
 </resources>

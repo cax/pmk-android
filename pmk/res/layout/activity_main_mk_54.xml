@@ -53,11 +53,12 @@
         android:padding="0dip" >
 
             <TextView
-                android:id="@+id/TextViewTableCellPlaceholderForGrads"
+                android:id="@+id/TextViewTableCellCalculatorName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="3dp"
                 android:layout_weight="5"
-                 />
+                android:text="@string/app_name" />
 	
             <TextView
                 android:id="@+id/TextViewGrads"
@@ -92,7 +93,7 @@
                       android:layout_height="wrap_content"
                       android:layout_weight="1"
                       android:gravity="center|right"
-                      android:paddingRight="2dp"
+                      android:paddingRight="3dp"
                       android:text="@string/TextViewRadians" />
 
                   <RadioButton
@@ -446,129 +447,87 @@
 	    android:layout_height="wrap_content"
 	    android:layout_weight="10"
 	    android:padding="0dip" >
-		  
-	   <LinearLayout
-	       android:layout_width="wrap_content"
-	       android:layout_height="fill_parent"
-	       android:layout_weight="1"
-	       android:orientation="vertical" >
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:orientation="vertical" >
 
-	            <TextView
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_alignParentLeft="true"
-	                android:paddingLeft="5dp"
-	                android:text="@string/button7Yellow"
-	                android:textColor="@color/yellowColor" />
-	
-	            <TextView
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_alignParentRight="true"
-	                android:paddingRight="5dp"
-	                android:text="@string/button7Blue"
-	                android:textColor="@color/blueColor" />
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:text="@string/button7Yellow"
+		        android:textColor="@color/yellowColor" />
 
-			</RelativeLayout>
-			
-	        <Button
-	            android:layout_width="fill_parent"
-	            android:layout_height="fill_parent"
-	            android:layout_gravity="bottom"
-	            android:onClick="onButton" android:background="@drawable/button"
-	            android:tag="17"
-	            android:text="@string/button7"
-	            android:textColor="@color/blackColor"
-	            android:textColorHint="@color/blackColor"
-	            android:textStyle="bold" android:textSize="25sp" />
+		    <Button
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_gravity="bottom"
+		        android:background="@drawable/button"
+		        android:onClick="onButton"
+		        android:tag="17"
+		        android:text="@string/button7"
+		        android:textColor="@color/blackColor"
+		        android:textColorHint="@color/blackColor"
+		        android:textSize="25sp"
+		        android:textStyle="bold" />
+		</LinearLayout>
 
-       </LinearLayout>
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:orientation="vertical" >
 
-	   <LinearLayout
-	       android:layout_width="wrap_content"
-	       android:layout_height="fill_parent"
-	       android:layout_weight="1"
-	       android:orientation="vertical" >
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:text="@string/button8Yellow"
+		        android:textColor="@color/yellowColor" />
 
-           <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-	
-	            <TextView
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_alignParentLeft="true"
-	                android:paddingLeft="5dp"
-	                android:text="@string/button8Yellow"
-	                android:textColor="@color/yellowColor" />
-	
-	            <TextView
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_alignParentRight="true"
-	                android:paddingRight="5dp"
-	                android:text="@string/button8Blue"
-	                android:textColor="@color/blueColor" />
-	
-			</RelativeLayout>
-	
-	        <Button
-	            android:layout_width="fill_parent"
-	            android:layout_height="fill_parent"
-	            android:layout_gravity="bottom"
-	            android:onClick="onButton" android:background="@drawable/button"
-	            android:tag="18"
-	            android:text="@string/button8"
-	            android:textColor="@color/blackColor"
-	            android:textColorHint="@color/blackColor"
-	            android:textStyle="bold" android:textSize="25sp" />
+		    <Button
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_gravity="bottom"
+		        android:background="@drawable/button"
+		        android:onClick="onButton"
+		        android:tag="18"
+		        android:text="@string/button8"
+		        android:textColor="@color/blackColor"
+		        android:textColorHint="@color/blackColor"
+		        android:textSize="25sp"
+		        android:textStyle="bold" />
+		</LinearLayout>
 
-        </LinearLayout>
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:orientation="vertical" >
 
-	   <LinearLayout
-	       android:layout_width="wrap_content"
-	       android:layout_height="fill_parent"
-	       android:layout_weight="1"
-	       android:orientation="vertical" >
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:text="@string/button9Yellow"
+		        android:textColor="@color/yellowColor" />
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="5dp"
-                android:text="@string/button9Yellow"
-                android:textColor="@color/yellowColor" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:paddingRight="5dp"
-                android:text="@string/button9Blue"
-                android:textColor="@color/blueColor" />
-
-			</RelativeLayout>
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
-                android:tag="19"
-                android:text="@string/button9"
-                android:textColor="@color/blackColor"
-                android:textColorHint="#FFFF00"
-                android:textStyle="bold" android:textSize="25sp" />
-
-        </LinearLayout>
+		    <Button
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_gravity="bottom"
+		        android:background="@drawable/button"
+		        android:onClick="onButton"
+		        android:tag="19"
+		        android:text="@string/button9"
+		        android:textColor="@color/blackColor"
+		        android:textColorHint="@color/blackColor"
+		        android:textSize="25sp"
+		        android:textStyle="bold" />
+		</LinearLayout>
 
 	   <LinearLayout
 	       android:layout_width="wrap_content"
@@ -633,169 +592,113 @@
 	    android:layout_height="wrap_content"
 	    android:layout_weight="10"
 	    android:padding="0dip" >
-		  
-	   <LinearLayout
-	       android:layout_width="wrap_content"
-	       android:layout_height="fill_parent"
-	       android:layout_weight="1"
-	       android:orientation="vertical" >
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:orientation="vertical" >
 
-	            <TextView
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_alignParentLeft="true"
-	                android:paddingLeft="5dp"
-	                android:text="@string/button4Yellow"
-	                android:textColor="@color/yellowColor" />
-	
-	            <TextView
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_alignParentRight="true"
-	                android:paddingRight="5dp"
-	                android:text="@string/button4Blue"
-	                android:textColor="@color/blueColor" />
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:text="@string/button4Yellow"
+		        android:textColor="@color/yellowColor" />
 
-			</RelativeLayout>
-			
-	        <Button
-	            android:layout_width="fill_parent"
-	            android:layout_height="fill_parent"
-	            android:layout_gravity="bottom"
-	            android:onClick="onButton" android:background="@drawable/button"
-	            android:tag="14"
-	            android:text="@string/button4"
-	            android:textColor="@color/blackColor"
-	            android:textColorHint="@color/blackColor"
-	            android:textStyle="bold" android:textSize="25sp" />
+		    <Button
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_gravity="bottom"
+		        android:background="@drawable/button"
+		        android:onClick="onButton"
+		        android:tag="14"
+		        android:text="@string/button4"
+		        android:textColor="@color/blackColor"
+		        android:textColorHint="@color/blackColor"
+		        android:textSize="25sp"
+		        android:textStyle="bold" />
+		</LinearLayout>
 
-       </LinearLayout>
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:orientation="vertical" >
 
-	   <LinearLayout
-	       android:layout_width="wrap_content"
-	       android:layout_height="fill_parent"
-	       android:layout_weight="1"
-	       android:orientation="vertical" >
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:text="@string/button5Yellow"
+		        android:textColor="@color/yellowColor" />
 
-           <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-	
-	            <TextView
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_alignParentLeft="true"
-	                android:paddingLeft="5dp"
-	                android:text="@string/button5Yellow"
-	                android:textColor="@color/yellowColor" />
-	
-	            <TextView
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_alignParentRight="true"
-	                android:paddingRight="5dp"
-	                android:text="@string/button5Blue"
-	                android:textColor="@color/blueColor" />
-	
-			</RelativeLayout>
-	
-	        <Button
-	            android:layout_width="fill_parent"
-	            android:layout_height="fill_parent"
-	            android:layout_gravity="bottom"
-	            android:onClick="onButton" android:background="@drawable/button"
-	            android:tag="15"
-	            android:text="@string/button5"
-	            android:textColor="@color/blackColor"
-	            android:textColorHint="@color/blackColor"
-	            android:textStyle="bold" android:textSize="25sp" />
+		    <Button
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_gravity="bottom"
+		        android:background="@drawable/button"
+		        android:onClick="onButton"
+		        android:tag="15"
+		        android:text="@string/button5"
+		        android:textColor="@color/blackColor"
+		        android:textColorHint="@color/blackColor"
+		        android:textSize="25sp"
+		        android:textStyle="bold" />
+		</LinearLayout>
 
-        </LinearLayout>
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:orientation="vertical" >
 
-	   <LinearLayout
-	       android:layout_width="wrap_content"
-	       android:layout_height="fill_parent"
-	       android:layout_weight="1"
-	       android:orientation="vertical" >
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:text="@string/button6Yellow"
+		        android:textColor="@color/yellowColor" />
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
+		    <Button
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_gravity="bottom"
+		        android:background="@drawable/button"
+		        android:onClick="onButton"
+		        android:tag="16"
+		        android:text="@string/button6"
+		        android:textColor="@color/blackColor"
+		        android:textColorHint="@color/blackColor"
+		        android:textSize="25sp"
+		        android:textStyle="bold" />
+		</LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="5dp"
-                android:text="@string/button6Yellow"
-                android:textColor="@color/yellowColor" />
+		<LinearLayout
+		    android:layout_width="wrap_content"
+		    android:layout_height="fill_parent"
+		    android:layout_weight="1"
+		    android:orientation="vertical" >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:paddingRight="5dp"
-                android:text="@string/button6Blue"
-                android:textColor="@color/blueColor" />
+		    <TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center"
+		        android:text="@string/buttonAddYellow"
+		        android:textColor="@color/yellowColor" />
 
-			</RelativeLayout>
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
-                android:tag="16"
-                android:text="@string/button6"
-                android:textColor="@color/blackColor"
-                android:textColorHint="#FFFF00"
-                android:textStyle="bold" android:textSize="25sp" />
-
-        </LinearLayout>
-
-	   <LinearLayout
-	       android:layout_width="wrap_content"
-	       android:layout_height="fill_parent"
-	       android:layout_weight="1"
-	       android:orientation="vertical" >
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="5dp"
-                android:text="@string/buttonAddYellow"
-                android:textColor="@color/yellowColor" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:paddingRight="5dp"
-                android:text="@string/buttonAddBlue"
-                android:textColor="@color/blueColor" />
-
-			</RelativeLayout>
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
-                android:tag="20"
-                android:text="@string/buttonAdd"
-                android:textColor="@color/blackColor"
-                android:textColorHint="@color/blackColor"
-                android:textStyle="bold" android:textSize="25sp" />
-
+		    <Button
+		        android:layout_width="fill_parent"
+		        android:layout_height="fill_parent"
+		        android:layout_gravity="bottom"
+		        android:background="@drawable/button"
+		        android:onClick="onButton"
+		        android:tag="20"
+		        android:text="@string/buttonAdd"
+		        android:textColor="@color/blackColor"
+		        android:textColorHint="@color/blackColor"
+		        android:textSize="25sp"
+		        android:textStyle="bold" />
 		</LinearLayout>
 
 	   <LinearLayout
@@ -861,6 +764,33 @@
 
         </LinearLayout>
 
+	   <LinearLayout
+	       android:layout_width="wrap_content"
+	       android:layout_height="fill_parent"
+	       android:layout_weight="1"
+	       android:orientation="vertical" >
+
+	       <TextView
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:layout_gravity="center"
+	           android:text="@string/button2Yellow"
+	           android:textColor="@color/yellowColor" />
+
+	       <Button
+	           android:layout_width="fill_parent"
+	           android:layout_height="fill_parent"
+	           android:layout_gravity="bottom"
+	           android:background="@drawable/button"
+	           android:onClick="onButton"
+	           android:tag="12"
+	           android:text="@string/button2"
+	           android:textColor="@color/blackColor"
+	           android:textColorHint="@color/blackColor"
+	           android:textSize="25sp"
+	           android:textStyle="bold" />
+	   </LinearLayout>
+
 	   	<LinearLayout
 	   	    android:layout_width="wrap_content"
 	   	    android:layout_height="fill_parent"
@@ -871,60 +801,21 @@
 	           android:layout_width="wrap_content"
 	           android:layout_height="wrap_content"
 	           android:layout_gravity="center"
-	           android:text="@string/button2Yellow"
+	           android:text="@string/button3Yellow"
 	           android:textColor="@color/yellowColor" />
 
             <Button
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
-                android:tag="12"
-                android:text="@string/button2"
-                android:textColor="@color/blackColor"
-                android:textColorHint="@color/blackColor"
-                android:textStyle="bold" android:textSize="25sp" />
-
-        </LinearLayout>
-      	  	   	  
-	   <LinearLayout
-	       android:layout_width="wrap_content"
-	       android:layout_height="fill_parent"
-	       android:layout_weight="1"
-	       android:orientation="vertical" >
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="5dp"
-                android:text="@string/button3Yellow"
-                android:textColor="@color/yellowColor" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:paddingRight="5dp"
-                android:text="@string/button3Blue"
-                android:textColor="@color/blueColor" />
-
-			</RelativeLayout>
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
+                android:background="@drawable/button"
+                android:onClick="onButton"
                 android:tag="13"
                 android:text="@string/button3"
                 android:textColor="@color/blackColor"
-                android:textColorHint="#FFFF00"
-                android:textStyle="bold" android:textSize="25sp" />
+                android:textColorHint="@color/blackColor"
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -934,90 +825,55 @@
 	       android:layout_weight="1"
 	       android:orientation="vertical" >
 
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
+	       <TextView
+	           android:id="@+id/labelXpowerY"
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:layout_gravity="center"
+	           android:text="@string/buttonExchangeXYYellow"
+	           android:textColor="@color/yellowColor" />
 
-            <TextView
-                android:id="@+id/labelXpowerY"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="5dp"
-                android:text="@string/buttonExchangeXYYellow"
-                android:textColor="@color/yellowColor" />
+	       <Button
+	           android:layout_width="fill_parent"
+	           android:layout_height="fill_parent"
+	           android:layout_gravity="bottom"
+	           android:background="@drawable/button"
+	           android:onClick="onButton"
+	           android:tag="24"
+	           android:text="@string/buttonExchangeXY"
+	           android:textColor="@color/blackColor"
+	           android:textColorHint="@color/blackColor"
+	           android:textSize="25sp"
+	           android:textStyle="bold" />
+	   </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:paddingRight="5dp"
-                android:text="@string/buttonExchangeXYBlue"
-                android:textColor="@color/blueColor" />
+	   <LinearLayout
+	       android:layout_width="wrap_content"
+	       android:layout_height="fill_parent"
+	       android:layout_weight="1"
+	       android:orientation="vertical" >
 
-			</RelativeLayout>
+	       <TextView
+	           android:layout_width="wrap_content"
+	           android:layout_height="wrap_content"
+	           android:layout_gravity="center"
+	           android:text="@string/buttonUpStackYellow"
+	           android:textColor="@color/yellowColor" />
 
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
-                android:tag="24"
-                android:text="@string/buttonExchangeXY"
-                android:textColor="@color/blackColor"
-                android:textColorHint="@color/blackColor"
-                android:textSize="25sp" />
-
-		</LinearLayout>
-	   	  
-	    <LinearLayout
-	        android:layout_width="wrap_content"
-	        android:layout_height="fill_parent"
-	        android:layout_weight="1"
-	        android:orientation="vertical" >
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:paddingLeft="5dp"
-                android:text="@string/buttonUpStackYellow"
-                android:textColor="@color/yellowColor" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center"
-                android:text="@string/buttonLetterE"
-                android:textColor="@color/whiteColor" />
-            
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:paddingRight="5dp"
-                android:text="@string/buttonUpStackBlue"
-                android:textColor="@color/blueColor" />
-
-			</RelativeLayout>
-
-            <Button
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
-                android:tag="29"
-                android:text="@string/buttonUpStack"
-                android:textColor="@color/blackColor"
-                android:textColorHint="@color/blackColor"
-                android:textStyle="bold" android:textSize="25sp" />
-			
-        </LinearLayout>
+	       <Button
+               android:id="@+id/buttonUpStack"
+	           android:layout_width="fill_parent"
+	           android:layout_height="fill_parent"
+	           android:layout_gravity="bottom"
+	           android:background="@drawable/button"
+	           android:onClick="onButton"
+	           android:tag="29"
+	           android:text="@string/buttonUpStack"
+	           android:textColor="@color/blackColor"
+	           android:textColorHint="@color/blackColor"
+	           android:textSize="25sp"
+	           android:textStyle="bold" />
+	   </LinearLayout>
 
 	</TableRow>
       
@@ -1043,7 +899,7 @@
 	                android:id="@+id/label10powerX"
 	                android:layout_width="wrap_content"
 	                android:layout_height="wrap_content"
-	                android:layout_alignParentLeft="true"
+	                android:layout_centerInParent="true"
 	                android:paddingLeft="5dp"
 	                android:text="@string/button0Yellow"
 	                android:textColor="@color/yellowColor" />
@@ -1053,7 +909,6 @@
 	                android:layout_height="wrap_content"
 	                android:layout_alignParentRight="true"
 	                android:paddingRight="5dp"
-	                android:text="@string/button0Blue"
 	                android:textColor="@color/blueColor" />
 
 			</RelativeLayout>
@@ -1085,7 +940,7 @@
 	                android:id="@+id/labelDot"
 	                android:layout_width="wrap_content"
 	                android:layout_height="wrap_content"
-	                android:layout_alignParentLeft="true"
+	                android:layout_centerInParent="true"
 	                android:paddingLeft="5dp"
 	                android:text="@string/buttonDotYellow"
 	                android:textColor="@color/yellowColor" />
@@ -1095,7 +950,6 @@
 	                android:layout_height="wrap_content"
 	                android:layout_alignParentRight="true"
 	                android:paddingRight="5dp"
-	                android:text="@string/buttonDotBlue"
 	                android:textColor="@color/blueColor" />
 	
 			</RelativeLayout>
@@ -1126,7 +980,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
                 android:paddingLeft="5dp"
                 android:text="@string/buttonNegateYellow"
                 android:textColor="@color/yellowColor" />
@@ -1136,7 +990,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:paddingRight="5dp"
-                android:text="@string/buttonNegateBlue"
                 android:textColor="@color/blueColor" />
 
 			</RelativeLayout>
@@ -1167,7 +1020,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
                 android:paddingLeft="5dp"
                 android:text="@string/buttonOrderOfTenYellow"
                 android:textColor="@color/yellowColor" />
@@ -1177,7 +1030,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:paddingRight="5dp"
-                android:text="@string/buttonOrderOfTenBlue"
                 android:textColor="@color/blueColor" />
 
 			</RelativeLayout>
@@ -1208,7 +1060,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
+                android:layout_centerInParent="true"
                 android:paddingLeft="5dp"
                 android:text="@string/buttonClearYellow"
                 android:textColor="@color/yellowColor" />
@@ -1218,7 +1070,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:paddingRight="5dp"
-                android:text="@string/buttonClearBlue"
                 android:textColor="@color/blueColor" />
 
 			</RelativeLayout>
@@ -1228,12 +1079,14 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom"
-                android:onClick="onButton" android:background="@drawable/button"
+                android:background="@drawable/button"
+                android:onClick="onButton"
                 android:tag="28"
-                android:text="@string/buttonClear"
+                android:text="@string/buttonClearMK54"
                 android:textColor="@color/whiteColor"
                 android:textColorHint="@color/whiteColor"
-                android:textStyle="bold" android:textSize="25sp" />
+                android:textSize="25sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -1252,12 +1105,13 @@
 			   android:layout_height="wrap_content"
 			   android:layout_weight="1"
 			   android:orientation="vertical" >
+
 				<TextView
-			           android:layout_width="wrap_content"
-			           android:layout_height="wrap_content"
-			           android:layout_gravity="center"
-			           android:text=""
-			           android:textColor="@color/whiteColor" />
+				    android:layout_width="wrap_content"
+				    android:layout_height="wrap_content"
+				    android:layout_gravity="center"
+				    android:text="@string/button0Blue"
+				    android:textColor="@color/whiteColor" />
 
 		</LinearLayout>
 			<LinearLayout

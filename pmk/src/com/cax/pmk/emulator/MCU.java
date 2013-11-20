@@ -169,13 +169,14 @@ public class MCU implements Externalizable
 		microtick += 4;
 		if (microtick > 167) microtick = 0;
 		
-		if (keyb_processed) keyb_x = keyb_y = 0;
+		if (keyb_processed && ik130x != 3) keyb_x = keyb_y = 0;
 	}
 
 	transient int[] ucmd_rom;
 	transient int[] cmd_rom;
 	transient int[] synchro_rom;
-
+	transient public int ik130x;
+	
 	int[] R;
 	int[] M;
 	int[] ST;

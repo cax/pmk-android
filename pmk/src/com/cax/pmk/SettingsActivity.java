@@ -1,5 +1,7 @@
 package com.cax.pmk;
 
+import java.text.MessageFormat;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -36,7 +38,7 @@ public class SettingsActivity extends PreferenceActivity {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
  
 		// set title
-		alertDialogBuilder.setTitle("About");
+		alertDialogBuilder.setTitle(getString(R.string.settings_about_title));
  
 		String versionName = "";
 		try {
@@ -46,21 +48,9 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 		    
 		// set dialog message
-		alertDialogBuilder.setMessage(""
-			 + "\"Electronica MK 61\" emulator\n"
-			 + "\n"
-			 + "App developer:\n"
-			 + "Stanislav Borutsky\n"
-			 + "stanislavb@gmail.com\n"
-			 + "\n"
-			 + "Version:\n"
-			 + versionName + "\n"
-			 + "\n"
-			 + "Based on emu145 project by Felix Lazarev\n"
-			 + "http://code.google.com/p/emu145\n"
-		);
-
-		alertDialogBuilder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
+		alertDialogBuilder.setMessage(MessageFormat.format(getString(R.string.msg_about), getString(R.string.app_name), versionName));
+		
+		alertDialogBuilder.setNegativeButton(getString(R.string.label_close), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 			}
@@ -74,7 +64,7 @@ public class SettingsActivity extends PreferenceActivity {
  
 		// change font size
 		TextView textView = (TextView) alertDialog.findViewById(android.R.id.message);
-		textView.setTextSize(12);
+		textView.setTextSize(14);
 
 	}
 }

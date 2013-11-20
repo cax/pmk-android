@@ -16,6 +16,10 @@ public class Emulator extends Thread implements EmulatorInterface
     	ind_comma_old = new boolean[12];
         displayString = new StringBuffer(24);
     	
+        IK1302.ik130x = 2;
+        IK1303.ik130x = 3;
+        IK1306.ik130x = 6;
+        
 		IK1302.ucmd_rom = UCommands.ik1302_urom;
 		IK1303.ucmd_rom = UCommands.ik1303_urom;
 		IK1306.ucmd_rom = UCommands.ik1306_urom;
@@ -57,6 +61,14 @@ public class Emulator extends Thread implements EmulatorInterface
 		return speed_mode;
 	}
 
+	public void setSaveStateName(String name) {
+		saveStateName = name;
+	}
+
+	public String getSaveStateName() {
+		return saveStateName;
+	}
+
 	public void keypad(int keycode) {
 		IK1302.keyb_x = (keycode % 10) + 2;
 		keycode /= 10;
@@ -84,8 +96,12 @@ public class Emulator extends Thread implements EmulatorInterface
 	void tick() {
 		IK1302.in = IR2_2.out;		IK1302.tick();
 		IK1303.in = IK1302.out;		IK1303.tick();
+
+		
 		IK1306.in = IK1303.out;		IK1306.tick();
 		IR2_1.in  = IK1306.out;		IR2_1.tick();
+//		IR2_1.in  = IK1303.out;		IR2_1.tick();
+
 		IR2_2.in  = IR2_1.out;		IR2_2.tick();
 		IK1302.M[((IK1302.microtick >>> 2) + 41) % 42] = IR2_2.out;
 	}
@@ -126,14 +142,14 @@ public class Emulator extends Thread implements EmulatorInterface
 		}
 	}
 
-	MCU IK1302 = new MCU();
+	MCU IK1302 = new MCU(); 
 	MCU IK1303 = new MCU();
 	MCU IK1306 = new MCU();
 	
 	Memory IR2_1 = new Memory();
 	Memory IR2_2 = new Memory();
 	
-	public String saveStateName="";
+	private String saveStateName="";
 
 	private int angle_mode = 10; // R=10, GRD=11, G=12
 	private int speed_mode = 0;  // 0=fast, 1=real speed

@@ -12,29 +12,40 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-    private static final String PERSISTENCE_STATE_FILENAME = "persist";
+	private static final String ANGLE_MODE_PREFERENCE_KEY = "angleMode";
+	private static final String SPEED_MODE_PREFERENCE_KEY = "speedMode";
+	private static final String PERSISTENCE_STATE_FILENAME = "persist";
     private static final String PERSISTENCE_STATE_EXTENSION = ".pmk";
-	private static final int    SAVE_SLOTS_NUMBER = 50;
+    private static final int    EDIT_TEXT_ENTRY_ID = 12345;
+	private static final int    SAVE_SLOTS_NUMBER = 99;
+	private static final int    SAVE_NAME_MAX_LEN = 25;
+	private static final int    VIBRATE_ON_OFF_SWITCH = 50;
+	private static final int    VIBRATE_ANGLE_SWITCH  = 20;
+	private static final int    VIBRATE_KEYPAD 		  = 15;
 	private static final boolean useFelixCode = false;
 	private int selectedSaveSlot = 0;
     private int tempSaveSlot = 0;
@@ -49,13 +60,17 @@ public class MainActivity extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        setContentView(R.layout.activity_main_mk_61);
 
         calculatorDisplay = (TextView) findViewById(R.id.textView_Indicator);
         Typeface tf = Typeface.createFromAsset(this.getAssets(), "fonts/digital-7-mod.ttf");
         calculatorDisplay.setTypeface(tf);
         calculatorDisplay.setText("");
 
+        ((TextView) findViewById(R.id.TextViewTableCellCalculatorName))
+        	.setText(getString(R.string.electronica) + "  " + getString(R.string.app_name));
+        
         tf = Typeface.createFromAsset(this.getAssets(), "fonts/missing-symbols.ttf");
         ((TextView)findViewById(R.id.labelSquare))  .setTypeface(tf);
         ((TextView)findViewById(R.id.labelEpowerX)) .setTypeface(tf);
@@ -63,6 +78,9 @@ public class MainActivity extends Activity {
         ((TextView)findViewById(R.id.labelXpowerY)) .setTypeface(tf);
         ((TextView)findViewById(R.id.labelDot))     .setTypeface(tf);
 
+        ((Button)findViewById(R.id.buttonUpStack)).setTypeface(tf, Typeface.BOLD);
+
+        
         findViewById(R.id.buttonF)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x00F5E345)); // yellow
         findViewById(R.id.buttonK)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x0071E3FF)); // blue
         findViewById(R.id.buttonClear).getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);            // red
@@ -79,9 +97,27 @@ public class MainActivity extends Activity {
         
         PreferenceManager.setDefaultValues(this, R.layout.preferences, false);
         activateSettings();
-	}
+        
+        // recover speed and angle modes even if calculator was switched off before destroying
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        speedMode = sharedPref.getInt(SPEED_MODE_PREFERENCE_KEY, 0);
+        angleMode = sharedPref.getInt(ANGLE_MODE_PREFERENCE_KEY, 0);
+        setAngleModeRadios();
+        
+    }
 
-    @Override
+	@Override
+    public void onDestroy() {
+		// remember speed and angle modes even if calculator was switched off before destroying
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+    	SharedPreferences.Editor editor = sharedPref.edit();
+    	editor.putInt(SPEED_MODE_PREFERENCE_KEY, speedMode);
+    	editor.putInt(ANGLE_MODE_PREFERENCE_KEY, angleMode);
+    	editor.commit();
+    	super.onDestroy();
+	}
+	
+	@Override
     public void onStart() {
     	super.onStart();
     	if (! loadState(-1)) {
@@ -139,7 +175,7 @@ public class MainActivity extends Activity {
     // calculator power switch callback
     public void onPower(View view) {
     	switchOnCalculator(((CheckBox)view).isChecked());
-    	if (vibrate) vibrator.vibrate(100);
+    	if (vibrate) vibrator.vibrate(VIBRATE_ON_OFF_SWITCH);
     }
     
     // calculator mode switch callback
@@ -147,7 +183,7 @@ public class MainActivity extends Activity {
         angleMode = Integer.parseInt((String)view.getTag());
         if (emulator != null) {
         	emulator.setAngleMode(angleMode);
-        	if (vibrate) vibrator.vibrate(20);
+        	if (vibrate) vibrator.vibrate(VIBRATE_ANGLE_SWITCH);
         }
     }
 
@@ -158,7 +194,7 @@ public class MainActivity extends Activity {
     	
     	int keycode = Integer.parseInt((String)view.getTag());
     	emulator.keypad(keycode);
-    	if (vibrate) vibrator.vibrate(15);
+    	if (vibrate) vibrator.vibrate(VIBRATE_KEYPAD);
     }
     
     // Show string on calculator display 
@@ -174,7 +210,7 @@ public class MainActivity extends Activity {
 
     // ----------------------- Dialogs --------------------------------
     private void chooseAndUseSaveSlot(final boolean save) {
-		if (save & emulator == null) // disable saving when calculator is switched off
+		if (save && emulator == null) // disable saving when calculator is switched off
 			return;
 		
 	    final CharSequence[] items = new CharSequence[SAVE_SLOTS_NUMBER];
@@ -182,8 +218,9 @@ public class MainActivity extends Activity {
     		items[i] = getSlotDisplayName(i);
     	}
 	
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Choose slot to " + (save ? "save" : "load"));
+	    ContextThemeWrapper cw = new ContextThemeWrapper( this, R.style.AlertDialogTheme );
+		AlertDialog.Builder builder = new AlertDialog.Builder(cw);
+		builder.setTitle(getString(R.string.msg_choose_slot) + " " + (save ? getString(R.string.msg_save) : getString(R.string.msg_load)));
 	
 		builder.setSingleChoiceItems(items, selectedSaveSlot, new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int item) {
@@ -191,18 +228,20 @@ public class MainActivity extends Activity {
 		    }
 		});
 	
-		builder.setPositiveButton(save ? "Save" : "Load", new DialogInterface.OnClickListener() {
+		builder.setPositiveButton(save ? getString(R.string.label_save) : getString(R.string.label_load), 
+				new DialogInterface.OnClickListener() {
 		    @Override
 		    public void onClick(DialogInterface dialog, int id) {
-		    	if (save)
-		    		saveState(tempSaveSlot);
-
-		    	if (loadState(tempSaveSlot))
-			    	selectedSaveSlot = tempSaveSlot;
+		    	if (save) {
+		    		chooseNameAndSaveState();
+		    	} else {
+			    	if (loadState(tempSaveSlot))
+				    	selectedSaveSlot = tempSaveSlot;
+		    	}
 		    }
 		});
 	
-		builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		builder.setNegativeButton(getString(R.string.label_cancel), new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 					dialog.cancel();
 			}
@@ -218,12 +257,37 @@ public class MainActivity extends Activity {
     }
     
 	// ----------------------- Save/Load emulator state --------------------------------
+    private void chooseNameAndSaveState() {
+    	String chosenName = emulator.getSaveStateName();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.msg_choose_name));
+        EditText input = new EditText(this);
+        input.setId(EDIT_TEXT_ENTRY_ID);
+        input.append(chosenName);
+        input.setFilters(new InputFilter[] { new InputFilter.LengthFilter(SAVE_NAME_MAX_LEN) });
+        builder.setView(input);
+        builder.setPositiveButton(getString(R.string.label_save), new DialogInterface.OnClickListener() {
+            //@Override
+            public void onClick(DialogInterface dialog, int which) {
+                EditText input = (EditText) ((Dialog)dialog).findViewById(EDIT_TEXT_ENTRY_ID);
+                Editable value = input.getText();
+                emulator.setSaveStateName(value.toString());
+	    		saveState(tempSaveSlot); // stop and save
+	    		loadState(tempSaveSlot); // keep going !
+		    	selectedSaveSlot = tempSaveSlot;
+            }
+        });
+        builder.show();
+
+    }
+    
     private String getSlotDisplayName(int i) {
     	String filename = getSlotFilename(i);
     	String i_str = "0" + (i+1);
-    	String slotName = "Slot " + i_str.substring(i_str.length()-2);
+    	i_str = i_str.substring(i_str.length()-2);
+    	String slotName = "";
     	if (!getFileStreamPath(getSlotFilename(i)).exists()) {
-    		slotName = slotName + " (empty)";
+    		slotName = getString(R.string.savestate_name_slot) + " " + i_str + " " + getString(R.string.savestate_name_empty);
     	} else {
 			FileInputStream fileIn = null;
 			ObjectInputStream in = null;
@@ -232,9 +296,9 @@ public class MainActivity extends Activity {
 				fileIn = openFileInput(filename);
 				in = new ObjectInputStream(fileIn);
 				com.cax.pmk.emulator.Emulator.readStateNamesMode = true;
-				com.cax.pmk.emulator.Emulator emulatorObjForStateNameOnly = (com.cax.pmk.emulator.Emulator) in.readObject();
-				if (emulatorObjForStateNameOnly.saveStateName != null && emulatorObjForStateNameOnly.saveStateName.length() > 0)
-					slotName = emulatorObjForStateNameOnly.saveStateName;
+				EmulatorInterface emulatorObjForStateNameOnly = (com.cax.pmk.emulator.Emulator) in.readObject();
+				if (emulatorObjForStateNameOnly.getSaveStateName() != null && emulatorObjForStateNameOnly.getSaveStateName().length() > 0)
+					slotName = emulatorObjForStateNameOnly.getSaveStateName();
 				in.close();
 				fileIn.close();
 		    } catch(Exception e) {
@@ -245,7 +309,7 @@ public class MainActivity extends Activity {
 				try { if (fileIn != null) fileIn.close(); } catch(IOException e) {}
 			}
     	}
-    	return slotName;
+    	return "[" + i_str + "] " + ("".equals(slotName) ? getString(R.string.savestate_name_noname) : slotName);
     }
 	
 	String getSlotFilename(int slotNumber) {
@@ -315,9 +379,7 @@ public class MainActivity extends Activity {
         	((CheckBox)findViewById(R.id.checkBoxPowerOnOff)).setChecked(true);
         	angleMode = emulator.getAngleMode();
         	speedMode = emulator.getSpeedMode();
-        	((RadioButton)findViewById(R.id.radioRadians)).setChecked(angleMode==0);
-        	((RadioButton)findViewById(R.id.radioDegrees)).setChecked(angleMode==1);
-        	((RadioButton)findViewById(R.id.radioGrads))  .setChecked(angleMode==2);
+        	setAngleModeRadios();
         	emulator.initTransient(this);
         	setIndicatorColor();
             emulator.start();
@@ -326,6 +388,12 @@ public class MainActivity extends Activity {
     }
 
     // ----------------------- Other --------------------------------
+    private void setAngleModeRadios() {
+    	((RadioButton)findViewById(R.id.radioRadians)).setChecked(angleMode==0);
+    	((RadioButton)findViewById(R.id.radioDegrees)).setChecked(angleMode==1);
+    	((RadioButton)findViewById(R.id.radioGrads))  .setChecked(angleMode==2);
+    }
+    
     private void activateSettings() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         vibrate = sharedPref.getBoolean(SettingsActivity.PREFERENCE_VIBRATE, true);
