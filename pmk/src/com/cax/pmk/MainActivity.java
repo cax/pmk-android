@@ -1,12 +1,5 @@
 package com.cax.pmk;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,55 +7,35 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
-import android.graphics.LightingColorFilter;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.text.Editable;
-import android.text.InputFilter;
+import android.util.Log;
 import android.util.TypedValue;
-import android.view.ContextThemeWrapper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
-	private static final String PERSISTENCE_STATE_FILENAME 	= "persist";
-    private static final String PERSISTENCE_STATE_EXTENSION = ".pmk";
-	private static final String EMPTY_INDICATOR = "/ / / / / / / / / / / / /"; // slash is an empty comma placeholder in indicator font
-	
-	private static final String INDCATOR_OFF_COLOR 		  = "#000000";
-	private static final String INDCATOR_FAST_SPEED_COLOR = "#444444";
-	private static final String INDCATOR_SLOW_SPEED_COLOR = "#001500";
-	
-	private static final int    VIBRATE_ON_OFF_SWITCH = 50;
-	private static final int    VIBRATE_ANGLE_SWITCH  = 20;
-	private static final int    VIBRATE_KEYPAD 		  = 15;
-	
-	private static final int    EDIT_TEXT_ENTRY_ID = 12345; // it has to be some number, so let it be 12345
-	private static final int    SAVE_SLOTS_NUMBER = 99;
-	private static final int    SAVE_NAME_MAX_LEN = 25;
+	private static final String EMPTY_INDICATOR = "/ / / / / / / / / / / / //"; // slash is an empty comma placeholder in indicator font
 
-	private EmulatorInterface emulator = null;
-	private int selectedSaveSlot = 0;
-    private int tempSaveSlot = 0;
+	private static final int [] blackButtons = 
+			new int[] { R.id.buttonStepBack,	R.id.buttonStepForward, R.id.buttonReturn,	R.id.buttonStopStart,
+		  				R.id.buttonXToRegister,	R.id.buttonRegisterToX, R.id.buttonGoto,	R.id.buttonSubroutine};
+
+	private EmulatorInterface emulator = null; void setEmulator(EmulatorInterface emulator) { this.emulator = emulator; }
 	private int angleMode = 0;
 	private int speedMode = 0;
 	private int mkModel = 0; // 0 for MK-61, 1 for MK-54
@@ -71,21 +44,45 @@ public class MainActivity extends Activity {
 	private float buttonTextSize = 0;
 	private float labelTextSize = 0;
 	private boolean  vibrate = true;
+	private boolean  vibrateWithMoreIntensity = false;
 	private int calcNameTouchCounter = 0;
-
+	
 	private TextView calculatorIndicator = null;
-    private CheckBox powerOnOffCheckbox = null;
+	
+    private CheckBox powerOnOffCheckBox = null;
+    private SeekBar  powerOnOffSlider   = null;
+
+    private RadioButton radioRadians = null;
+    private RadioButton radioGrads 	 = null;
+    private RadioButton radioDegrees = null;
+    private SeekBar angleModeSlider  = null;
+    
+    private int poweredOn = 0;
 	private Vibrator vibrator = null;
+	
+	SaveStateManager saveStateManager = new SaveStateManager(this);
+	
+	static boolean splashScreenMode = false;
 	
     // ----------------------- Activity life cycle handlers --------------------------------
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
+      	Log.d("DDD", "onCreate entered");
+
+		super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main_mk_61);
 
-        // remember on/off check box
-        powerOnOffCheckbox = (CheckBox)findViewById(R.id.checkBoxPowerOnOff); 
+    	MenuHelper.mainActivity = this;
+
+        // remember switches controls
+        powerOnOffSlider 	= (SeekBar) findViewById(R.id.powerOnOffSlider); 
+        powerOnOffCheckBox	= (CheckBox)findViewById(R.id.powerOnOffCheckBox); 
+
+        angleModeSlider	= (SeekBar) findViewById(R.id.angleModeSlider);
+        radioRadians 	= (RadioButton) findViewById(R.id.radioRadians);
+        radioGrads 	 	= (RadioButton) findViewById(R.id.radioGrads);
+        radioDegrees 	= (RadioButton) findViewById(R.id.radioDegrees);
 
         // remember labels padding for later use
         yellowLabelLeftPadding = findViewById(R.id.label10powerX).getPaddingLeft();
@@ -115,21 +112,38 @@ public class MainActivity extends Activity {
         	((Button)findViewById(viewId)).setTypeface(tf, Typeface.NORMAL);
         }
         
-        // scale buttons text
-        scaleButtonsTextSize();
-        
         // preferences initialization
         PreferenceManager.setDefaultValues(this, R.layout.preferences, false);
         activateSettings();
         
         // recover speed and angle modes from preferences even if calculator was switched off before destroying
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        speedMode = sharedPref.getInt(SettingsActivity.SPEED_MODE_PREFERENCE_KEY, 0);
-        angleMode = sharedPref.getInt(SettingsActivity.ANGLE_MODE_PREFERENCE_KEY, 0);
-        setAngleModeRadios();
+        speedMode = sharedPref.getInt(SettingsActivity.SPEED_MODE_PREFERENCE_KEY, SettingsActivity.DEFAULT_SPEED_MODE);
+        setAngleModeControl(sharedPref.getInt(SettingsActivity.ANGLE_MODE_PREFERENCE_KEY, SettingsActivity.DEFAULT_ANGLE_MODE));
         
+        // set listeners for slider movement
+        angleModeSlider.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { if (fromUser) onAngleMode(progress); }
+        });
+        
+        powerOnOffSlider.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(SeekBar seekBar) {} 
+            @Override public void onProgressChanged(final SeekBar seekBar, int progress, boolean fromUser) { if (fromUser) onPower(progress); }   	
+        });
+                
         // recover and set mkModel
-        setMkModel(sharedPref.getInt(SettingsActivity.MK_MODEL_PREFERENCE_KEY, 0));
+        setMkModel(sharedPref.getInt(SettingsActivity.MK_MODEL_PREFERENCE_KEY, SettingsActivity.DEFAULT_MK_MODEL));
+        
+        // Workaround for broken layout that fixes itself after refresh:
+        // start activity that does nothing and returns immediately
+       	splashScreenMode = true; // tells onPause/onRelease to their work only once, not twice
+      	Log.d("DDD", "onCreate set splashScreenMode, starting activity");
+        startActivity(new Intent(getApplicationContext(), SplashScreenActivity.class));
+      	Log.d("DDD", "onCreate leaving");
+        	
 	}
 
 	@Override
@@ -146,24 +160,27 @@ public class MainActivity extends Activity {
     	super.onDestroy();
 	}
 	
-	@Override
-    public void onStart() {
-    	super.onStart();
-    	if (! loadState(-1)) { // load persistence emulation state
-    		switchOnCalculator(true);
-    	}
-    }
-
     @Override
-    public void onStop() {
-    	super.onStop();
-       	saveState(-1); // load persistence emulation state
+    public void onPause() {
+    	super.onPause();
+    	if (splashScreenMode) {
+    		splashScreenMode = false;
+    		return;
+    	}
+    	
+       	saveStateManager.saveStateStoppingEmulator(emulator, -1); // save persistence emulation state
+       	emulator = null;
     }
 
     @Override
     public void onResume() {
     	super.onResume();
-        activateSettings();
+    	if (splashScreenMode) {
+    		return;
+    	}
+    	
+    	activateSettings();
+      	if (emulator == null) saveStateManager.loadState(emulator, -1); // load persistence emulation state
     }
     
     // ----------------------- Menu hooks --------------------------------
@@ -172,7 +189,7 @@ public class MainActivity extends Activity {
         MenuItem menu_save = menu.findItem(R.id.menu_save);      
         MenuItem menu_swap = menu.findItem(R.id.menu_swap_model);      
 
-        if(powerOnOffCheckbox.isChecked()) 
+        if(poweredOn == 1) 
         {           
         	menu_swap.setVisible(false);
         	menu_save.setVisible(true);
@@ -195,19 +212,19 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	 switch (item.getItemId()) {
 	    	 case R.id.menu_about:
-	    		 aboutDialog();
+	    		 MenuHelper.aboutDialog();
 	 	        return true;
 	    	 case R.id.menu_settings:
-    	    	goSettingsScreen();
+	    		 MenuHelper.goSettingsScreen();
     	        return true;
     	    case R.id.menu_swap_model:
-    	    	onChooseMkModel();
+    	    	MenuHelper.onChooseMkModel(mkModel);
     	        return true;
     	    case R.id.menu_save:
-    	    	chooseAndUseSaveSlot(true);
+    	    	saveStateManager.chooseAndUseSaveSlot(emulator, true);
     	        return true;
     	    case R.id.menu_load:
-    	    	chooseAndUseSaveSlot(false);
+    	    	saveStateManager.chooseAndUseSaveSlot(emulator, false);
     	        return true;
     	        
     	    default:
@@ -215,72 +232,35 @@ public class MainActivity extends Activity {
     	    }
     }
     
-    // ----------------------- UI call backs --------------------------------
-    // calculator name touch callback
-    public void onCalculatorName(View view) {
-    	calcNameTouchCounter = (calcNameTouchCounter + 1) % 33;
-    	if (calcNameTouchCounter != 0) return; // act only on every 33th click - hidden feature !
-    	
-    	setMkModel(1 - mkModel);
-    	if (emulator != null)
-    		emulator.setMkModel(mkModel);
-    }
-
-    // calculator model menu option callback
-    public void onChooseMkModel() {
-	    ContextThemeWrapper cw = new ContextThemeWrapper( this, R.style.AlertDialogTheme );
-		AlertDialog.Builder builder = new AlertDialog.Builder(cw);
-	
-		builder.setSingleChoiceItems(new String[] {getString(R.string.item_mk61), getString(R.string.item_mk54)}, mkModel, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int item) {
-		    	setMkModel(item);
-				dialog.cancel();
-		    }
-		});
-
-		AlertDialog alert = builder.create();
-		alert.show();		
-	}
-
-    // calculator indicator touch callback
-    public void onIndicator(View view) {
-        if (emulator != null) {
-        	emulator.setSpeedMode(1 - emulator.getSpeedMode());
-        	speedMode = emulator.getSpeedMode();
-        }
-    	setIndicatorColor();
-    }
-
-    // calculator power switch callback
-    public void onPower(View view) {
-    	if (vibrate) vibrator.vibrate(VIBRATE_ON_OFF_SWITCH);
-    	boolean isOn = ((CheckBox)view).isChecked();
-    	switchOnCalculator(isOn);
+    // ----------------------- Setting controls state --------------------------------
+    void setAngleModeControl(int mode) {
+    	angleMode = mode;
+    	angleModeSlider.setProgress(angleMode);
+    	radioRadians.setChecked(angleMode == 0);
+    	radioGrads  .setChecked(angleMode == 1);
+    	radioDegrees.setChecked(angleMode == 2);
     }
     
-    // calculator mode switch callback
-    public void onMode(View view) {
-        angleMode = Integer.parseInt((String)view.getTag());
-        if (emulator != null) {
-        	emulator.setAngleMode(angleMode);
-        	if (vibrate) vibrator.vibrate(VIBRATE_ANGLE_SWITCH);
-        }
+    void setPowerOnOffControl(int mode) {
+        poweredOn = mode;
+        if (powerOnOffSlider.getProgress() != mode) powerOnOffSlider.setProgress(mode);
+        if ((powerOnOffCheckBox.isChecked() ? 1:0) != mode) powerOnOffCheckBox.setChecked(mode==1);
     }
 
-    // calculator button press callback
-    public void onButton(View view) {
-    	if (emulator == null)
-    		return;
-    	
-    	int keycode = Integer.parseInt((String)view.getTag());
-    	emulator.keypad(keycode);
-    	if (vibrate) vibrator.vibrate(VIBRATE_KEYPAD);
-    }
-    
-    // on settings menu selected
-    private void goSettingsScreen() {
-    	Intent settingsScreen = new Intent(getApplicationContext(), SettingsActivity.class);
-        startActivity(settingsScreen);
+    void setIndicatorColor(int mode) {
+    	String color;
+    	if (mode < 0) {
+    		color = SettingsActivity.INDCATOR_OFF_COLOR;
+    	}
+    	else {
+        	speedMode = mode;
+			color = (speedMode == 0)
+    				? SettingsActivity.INDCATOR_FAST_SPEED_COLOR 
+    				: SettingsActivity.INDCATOR_SLOW_SPEED_COLOR;
+    	}
+
+    	((LinearLayout)findViewById(R.id.linearLayout_Indicator))
+    			.setBackgroundColor(Color.parseColor(color));
     }
     
     // Show string on calculator display 
@@ -293,232 +273,97 @@ public class MainActivity extends Activity {
     	   }
     	});
     }
-
-    // ----------------------- Dialogs --------------------------------
-    private void chooseAndUseSaveSlot(final boolean save) {
-		if (save && emulator == null) // disable saving when calculator is switched off
-			return;
-		
-	    final CharSequence[] items = new CharSequence[SAVE_SLOTS_NUMBER];
-	    for (int i=0; i < SAVE_SLOTS_NUMBER; i++) {
-    		items[i] = getSlotDisplayName(i);
-    	}
-	
-	    ContextThemeWrapper cw = new ContextThemeWrapper( this, R.style.AlertDialogTheme );
-		AlertDialog.Builder builder = new AlertDialog.Builder(cw);
-		builder.setTitle(getString(R.string.msg_choose_slot) + " " + (save ? getString(R.string.msg_save) : getString(R.string.msg_load)));
-	
-		builder.setSingleChoiceItems(items, selectedSaveSlot, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int item) {
-		    	tempSaveSlot = item;
-		    }
-		});
-	
-		builder.setPositiveButton(save ? getString(R.string.label_save) : getString(R.string.label_load), 
-				new DialogInterface.OnClickListener() {
-		    @Override
-		    public void onClick(DialogInterface dialog, int id) {
-		    	if (save) {
-		    		chooseNameAndSaveState();
-		    	} else {
-			    	if (loadState(tempSaveSlot))
-				    	selectedSaveSlot = tempSaveSlot;
-		    	}
-		    }
-		});
-	
-		builder.setNegativeButton(getString(R.string.label_cancel), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-					dialog.cancel();
-			}
-		});
-
-		AlertDialog alert = builder.create();
-		alert.show();		
-	}
-	
-	private void aboutDialog() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
- 
-		// set title
-		alertDialogBuilder.setTitle(getString(R.string.menu_about));
- 
-		String versionName = "";
-		try {
-			versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-		} catch (NameNotFoundException e) {
-		    e.printStackTrace();
-		}
-		    
-		// set dialog message
-		alertDialogBuilder.setMessage(MessageFormat.format(getString(R.string.msg_about), versionName));
-		
-		alertDialogBuilder.setNegativeButton(getString(R.string.label_close), new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-					dialog.cancel();
-			}
-		});
-
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
- 		 
-		// show it
-		alertDialog.show();
- 
-		// change font size
-		TextView textView = (TextView) alertDialog.findViewById(android.R.id.message);
-		textView.setTextSize(14);
-
-	}
     
-	// ----------------------- Save/Load emulator state --------------------------------
-    private void chooseNameAndSaveState() {
-    	String chosenName = emulator.getSaveStateName();
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.msg_choose_name));
-        EditText input = new EditText(this);
-        input.setId(EDIT_TEXT_ENTRY_ID);
-        input.append(chosenName);
-        input.setFilters(new InputFilter[] { new InputFilter.LengthFilter(SAVE_NAME_MAX_LEN) });
-        builder.setView(input);
-        builder.setPositiveButton(getString(R.string.label_save), new DialogInterface.OnClickListener() {
-            //@Override
-            public void onClick(DialogInterface dialog, int which) {
-                EditText input = (EditText) ((Dialog)dialog).findViewById(EDIT_TEXT_ENTRY_ID);
-                Editable value = input.getText();
-                emulator.setSaveStateName(value.toString());
-	    		saveState(tempSaveSlot); // stop and save
-	    		loadState(tempSaveSlot); // keep going !
-		    	selectedSaveSlot = tempSaveSlot;
-            }
-        });
-        builder.show();
+    // ----------------------- UI call backs --------------------------------
+    // calculator name touch callback
+    public void onCalculatorNameTouched(View view) {
+    	calcNameTouchCounter = (calcNameTouchCounter + 1) % 33;
+    	if (calcNameTouchCounter != 0) return; // act only on every 33th click - hidden feature !
+    	
+    	setMkModel(1 - mkModel);
+    	if (emulator != null)
+    		emulator.setMkModel(mkModel);
+    }
 
+    // calculator indicator touch callback
+    public void onIndicatorTouched(View view) {
+        if (emulator != null) {
+        	emulator.setSpeedMode(1 - emulator.getSpeedMode());
+        	setIndicatorColor(emulator.getSpeedMode());
+        }
+    }
+
+    // calculator power switch callback
+    public void onPowerCheckBoxTouched(View view) {
+    	onPower(((CheckBox)view).isChecked() ? 1 : 0);
     }
     
-    private String getSlotDisplayName(int i) {
-    	String filename = getSlotFilename(i);
-    	String i_str = "0" + (i+1);
-    	i_str = i_str.substring(i_str.length()-2);
-    	String slotName = "";
-    	if (!getFileStreamPath(getSlotFilename(i)).exists()) {
-    		slotName = getString(R.string.savestate_name_slot) + " " + i_str + " " + getString(R.string.savestate_name_empty);
-    	} else {
-			FileInputStream fileIn = null;
-			ObjectInputStream in = null;
-	
-			try {
-				fileIn = openFileInput(filename);
-				in = new ObjectInputStream(fileIn);
-				com.cax.pmk.emulator.Emulator.readStateNamesMode = true;
-				EmulatorInterface emulatorObjForStateNameOnly = (com.cax.pmk.emulator.Emulator) in.readObject();
-				if (emulatorObjForStateNameOnly.getSaveStateName() != null && emulatorObjForStateNameOnly.getSaveStateName().length() > 0)
-					slotName = emulatorObjForStateNameOnly.getSaveStateName();
-				in.close();
-				fileIn.close();
-		    } catch(Exception e) {
-		    	e.printStackTrace();
-			} finally {
-				com.cax.pmk.emulator.Emulator.readStateNamesMode = false;
-				try { if (in != null) in.close(); } catch(IOException e) {} 
-				try { if (fileIn != null) fileIn.close(); } catch(IOException e) {}
-			}
-    	}
-    	return "[" + i_str + "] " + ("".equals(slotName) ? getString(R.string.savestate_name_noname) : slotName);
-    }
-	
-	String getSlotFilename(int slotNumber) {
-    	String filename;
-    	if (slotNumber < 0)
-    		filename = PERSISTENCE_STATE_FILENAME;
-    	else
-    		filename = "slot" + slotNumber;
-    	filename += PERSISTENCE_STATE_EXTENSION;
-    	return filename;
+    private void onPower(int progress) {
+    	if (poweredOn == progress)
+    		return;
+    	poweredOn = progress;
+    	if (vibrate) vibrator.vibrate(SettingsActivity.VIBRATE_ON_OFF_SWITCH);
+    	switchOnCalculator(poweredOn == 1);
     }
     
-    boolean saveState(int slotNumber) {
+    // calculator angle mode switch callback
+    public void onAngleModeRadioButtonTouched(View view) {
+    	onAngleMode(Integer.parseInt((String)view.getTag()));
+    }
+    
+    private void onAngleMode(int progress) {
+    	angleMode = progress;
+        if (emulator != null) {
+        	emulator.setAngleMode(angleMode);
+        	if (vibrate) vibrator.vibrate(SettingsActivity.VIBRATE_ANGLE_SWITCH);
+        }
+    }
+
+    // calculator button press callback
+    public void onKeypadButtonTouched(View view) {
     	if (emulator == null)
-    		return false;
+    		return;
     	
-    	emulator.stopEmulator();
-    	
-    	String filename = getSlotFilename(slotNumber);
-    	
-    	FileOutputStream fileOut = null;
-    	ObjectOutputStream out = null;
-		try {
-			fileOut = openFileOutput(filename, Context.MODE_PRIVATE);
-			out = new ObjectOutputStream(fileOut);
-			out.writeObject(emulator);
-			return true;
-	    } catch(IOException i) {
-			  return false;
-		} finally {
-	    	emulator = null;
-			try { if (out != null)         out.close(); } catch(IOException i) {} 
-			try { if (fileOut != null) fileOut.close(); } catch(IOException i) {}
-		}
+    	int keycode = Integer.parseInt((String)view.getTag());
+    	emulator.keypad(keycode);
+    	if (vibrate) vibrator.vibrate(vibrateWithMoreIntensity ? SettingsActivity.VIBRATE_KEYPAD_MORE : SettingsActivity.VIBRATE_KEYPAD);
     }
-
-    boolean loadState(int slotNumber) {
-    	String filename = getSlotFilename(slotNumber);
-    	
-    	if (! getFileStreamPath(filename).exists())
-    		return false;
-    	
-		FileInputStream fileIn = null;
-		ObjectInputStream in = null;
-
-		EmulatorInterface loadedEmulator = null;
-		try {
-			fileIn = openFileInput(filename);
-			in = new ObjectInputStream(fileIn);
-			loadedEmulator = (com.cax.pmk.emulator.Emulator) in.readObject();
-			in.close();
-			fileIn.close();
-			
-	    } catch(Exception i) {
-			  return false;
-		} finally {
-			try { if (in != null)         in.close(); } catch(IOException i) {} 
-			try { if (fileIn != null) fileIn.close(); } catch(IOException i) {}
-		}
-
-    	if (emulator != null) {
-    		emulator.stopEmulator();
-    	}
-    	
-    	emulator = loadedEmulator;
-    	emulator.initTransient(this);
-
-    	angleMode = emulator.getAngleMode();
-    	speedMode = emulator.getSpeedMode();
-    	setAngleModeRadios();
-
-    	setMkModel(emulator.getMkModel());
-
-    	setIndicatorColor();
-
-    	powerOnOffCheckbox.setChecked(true);
-    	
-    	emulator.start();
-
-		return true;
-    }
-
+    
     // ----------------------- Other --------------------------------
-    void scaleButtonsTextSize() {
-	    float smallerButtonTextSize = (float) (buttonTextSize * 0.95);
+    void styleButtons() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+    	
+        float chosenButtonTextSize = buttonTextSize * Float.parseFloat(sharedPref.getString("pref_button_text_size", "1"));
+        float chosenLabelTextSize  = labelTextSize  * Float.parseFloat(sharedPref.getString("pref_label_text_size", "1"));
+
+    	boolean borderBlackButtons = sharedPref.getBoolean(SettingsActivity.PREFERENCE_BORDER_BLACK_BUTTONS, SettingsActivity.DEFAULT_BORDER_BLACK_BUTTONS);
+    	boolean borderOtherButtons = sharedPref.getBoolean(SettingsActivity.PREFERENCE_BORDER_OTHER_BUTTONS, SettingsActivity.DEFAULT_BORDER_OTHER_BUTTONS);
+    	
+    	float smallerButtonTextSize = (float) (chosenButtonTextSize * 0.8);
 	    ((Button)findViewById(R.id.buttonReturn   )).setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerButtonTextSize);
 	    ((Button)findViewById(R.id.buttonStopStart)).setTextSize(TypedValue.COMPLEX_UNIT_PX, smallerButtonTextSize);
 
 	    List<View> list = getAllChildrenBFS(findViewById(R.id.tableLayoutKeyboard));
 	    for (int i=0; i < list.size(); i++) {
 	    	if (list.get(i) instanceof Button) {
-	    		((Button)list.get(i)).setTextSize(TypedValue.COMPLEX_UNIT_PX, buttonTextSize);
+	    		Button b = (Button)list.get(i);
+	    		b.setTextSize(TypedValue.COMPLEX_UNIT_PX, chosenButtonTextSize);
+	    		boolean isBlack = false;
+	    		for (int j=0; j < blackButtons.length; j++) if (b.getId() == blackButtons[j]) { isBlack = true; break; }
+	    		if (isBlack) {
+	    			b.setBackgroundResource(borderBlackButtons ? R.drawable.button_black_border_white : R.drawable.button_black);
+	    		} else {
+	    			if (b.getId() == R.id.buttonF)
+		    			b.setBackgroundResource(borderOtherButtons ? R.drawable.button_yellow_border_black	: R.drawable.button_yellow);
+	    			else if (b.getId() == R.id.buttonK)
+	    				b.setBackgroundResource(borderOtherButtons ? R.drawable.button_blue_border_black	: R.drawable.button_blue);
+	    			else if (b.getId() == R.id.buttonClear)
+	    				b.setBackgroundResource(borderOtherButtons ? R.drawable.button_red_border_black		: R.drawable.button_red);
+	    			else 
+	    				b.setBackgroundResource(borderOtherButtons ? R.drawable.button_other_border_black	: R.drawable.button_other);
+	    		}
 	    	} else if (list.get(i) instanceof TextView) {
-	    		((TextView)list.get(i)).setTextSize(TypedValue.COMPLEX_UNIT_PX, labelTextSize);
+	    		((TextView)list.get(i)).setTextSize(TypedValue.COMPLEX_UNIT_PX, chosenLabelTextSize);
 	    	}
 	    }
     }
@@ -563,7 +408,7 @@ public class MainActivity extends Activity {
 
         ((TextView) findViewById(R.id.TextViewTableCellCalculatorName))
     	.setText(getString(R.string.electronica) + "  MK" + (mkModel==1 ? "-54" : " 61"));
-    	
+
         if (doNothing) return;
         
     	if (mkModel == 1) { // 1 for MK-54, 0 for MK-61
@@ -611,36 +456,41 @@ public class MainActivity extends Activity {
     	this.mkModel = mkModel;
     }
 		
-    private void setAngleModeRadios() {
-    	((RadioButton)findViewById(R.id.radioRadians)).setChecked(angleMode==0);
-    	((RadioButton)findViewById(R.id.radioDegrees)).setChecked(angleMode==1);
-    	((RadioButton)findViewById(R.id.radioGrads))  .setChecked(angleMode==2);
-    }
-    
     private void activateSettings() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        vibrate = sharedPref.getBoolean(SettingsActivity.PREFERENCE_VIBRATE, true);
-  		calculatorIndicator.setKeepScreenOn(sharedPref.getBoolean(SettingsActivity.PREFERENCE_SCREEN_ALWAYS_ON, true));
+        vibrate = sharedPref.getBoolean(SettingsActivity.PREFERENCE_VIBRATE, 
+        								SettingsActivity.DEFAULT_VIBRATE);
+        vibrateWithMoreIntensity = sharedPref.getBoolean(SettingsActivity.PREFERENCE_VIBRATE_KEYPAD_MORE,
+        												 SettingsActivity.DEFAULT_VIBRATE_KEYPAD_MORE);
+  		calculatorIndicator.setKeepScreenOn(
+  				sharedPref.getBoolean(SettingsActivity.PREFERENCE_SCREEN_ALWAYS_ON,
+  									  SettingsActivity.DEFAULT_SCREEN_ALWAYS_ON));
+  		
+        boolean sliderOnOff = sharedPref.getBoolean(SettingsActivity.PREFERENCE_SLIDER_ON_OFF, 
+													SettingsActivity.DEFAULT_SLIDER_ON_OFF);
+        powerOnOffSlider  .setVisibility(sliderOnOff ? View.VISIBLE : View.GONE);
+        powerOnOffCheckBox.setVisibility(sliderOnOff ? View.GONE    : View.VISIBLE);
+
+        boolean sliderAngle = sharedPref.getBoolean(SettingsActivity.PREFERENCE_SLIDER_ANGLE, 
+													SettingsActivity.DEFAULT_SLIDER_ANGLE);
+        angleModeSlider.setVisibility(sliderAngle ? View.VISIBLE : View.GONE);
+        radioRadians.setVisibility(sliderAngle ? View.GONE : View.VISIBLE);
+        radioGrads  .setVisibility(sliderAngle ? View.GONE : View.VISIBLE);
+        radioDegrees.setVisibility(sliderAngle ? View.GONE : View.VISIBLE);
+        
+  		// scale buttons text and set borders
+        styleButtons();
     }
         
-    private void setIndicatorColor() {
-    	String color = INDCATOR_OFF_COLOR;
-    	if (emulator != null) {
-    		color = emulator.getSpeedMode() == 0 ? INDCATOR_FAST_SPEED_COLOR : INDCATOR_SLOW_SPEED_COLOR;
-    	}
-    	((LinearLayout)findViewById(R.id.linearLayout_Indicator))
-    			.setBackgroundColor(Color.parseColor(color));
-    }
-    
     private void switchOnCalculator(boolean enable) {
     	if (enable) {
-    		if (powerOnOffCheckbox.isChecked()) {
+    		if (poweredOn == 1) {
 	            emulator = new com.cax.pmk.emulator.Emulator();
 	    		emulator.setAngleMode(angleMode);
 	    		emulator.setSpeedMode(speedMode);
 	    		emulator.setMkModel(mkModel);
 	    		emulator.initTransient(this);
-	        	setIndicatorColor();
+	        	setIndicatorColor(speedMode);
 	            emulator.start();
     		}
     	} else {
@@ -649,12 +499,14 @@ public class MainActivity extends Activity {
     			emulator = null;
     		}
             calculatorIndicator.setText(EMPTY_INDICATOR);
-            powerOnOffCheckbox.setChecked(false);
+
+            // just in case...
+            setPowerOnOffControl(0);
+            
             //erase persistence file
-            File file = getFileStreamPath(getSlotFilename(-1));
-            if (file.exists())
-            	file.delete();
-            setIndicatorColor();
+            saveStateManager.deleteSlot(-1);
+
+            setIndicatorColor(-1);
     	}
     }
 }

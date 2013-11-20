@@ -9,7 +9,6 @@
         <shape android:shape="rectangle">
 			<solid android:color="#F00505"/> 
 		    <corners android:radius="@dimen/button_radius"/>
-			<stroke android:width="1px" android:color="#000000" />
 		</shape>
     </item>
 

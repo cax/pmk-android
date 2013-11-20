@@ -1,3 +1,15 @@
+v2.3	(7 Oct 2013)
+
+ * fixed state saving instability on leaving app
+ * fixed layout resizing glitch
+ * switching calculator off and state saving/loading became faster
+
+ Added user preferences for:
+ * type of on/off and angle mode switches (checkbox/radio buttons or slider)
+ * vibration intensity
+ * buttons outline
+ * labels text size
+
 v2.2	(24 Sep 2013)
 
  * fixed UI scaling issue on normal-mdpi screens

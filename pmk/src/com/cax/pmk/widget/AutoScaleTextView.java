@@ -1,4 +1,4 @@
-package com.cax.pmk;
+package com.cax.pmk.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -7,6 +7,8 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.TextView;
 import com.cax.pmk.R;
+import com.cax.pmk.R.attr;
+import com.cax.pmk.R.styleable;
 
 /**
  * A custom Text View that lowers the text size when the text is to big for the TextView. 

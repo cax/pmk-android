@@ -1,0 +1,93 @@
+Emulator of "Electronika MK 61" and "Electronika MK-54" RPN programmable calculators.
+
+MK-61 was the best seller of all USSR programmable calculators of 1980-s (B3-34, MK-54, MK-56, MK-61, MK-52).
+
+Calculators are emulated on microcode level so they behave exactly like the original devices, including all non-documented features and inaccurate calculations. For ease of use application features saving and loading emulation states.
+
+This app's emulation engine Java code is based on C++ source of Felix Lazarev's emu145 project.
+Emulation was highly optimized for speed and should run in real time on any phone.
+
+Hint 1: touch calculator's indicator to toggle slow/fast mode. Indicator's blinking looks better in slow mode.
+Hint 2: you can choose between MK-61 and MK-54 using menu option that becomes visible when calculator is switched off. 
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+History of changes in previous versions:
+
+MK-61 v1.0 - the first working version
+MK-61 v1.1 - fixed UI bugs, speed optimization
+MK-61 v1.2 - keep state after pressing Home or Back
+MK-61 v1.3 - "About" dialog, enlarged digits, added state saving/loading (up to 50 slots)
+
+MK-61 v1.4
+- fix emulation for entering negative power of ten
+- 10x speed increase - now works even on old Android devices
+- touch indicator to toggle fast/slow mode
+- on fast phone use slow mode for blinking
+- fixed key press detection
+- fixed indicator symbols size
+- stable states saving - will be compatible with future versions
+
+MK-61 v1.5
+- main screen user interface completely redesigned from the scratch:
+* authentic look (as much as possible)
+* adaptive behavior that fits any screen from 2 to 10 inch
+
+- launcher icon redesigned
+
+- added slight vibration on button press, more sensible on angle mode change, even more intensive for on/off switch
+- screen never goes off even when nothing is touched for a long time
+
+MK-61 v1.6
+- added "Settings" page to let user choose vibration and/or disabled screen auto-off
+- indicator font size fix for tablets
+
+MK-61 v1.7
+- fixed ГРД angle mode switch position (was acting as Degrees mode instead of Grads)
+- saved states now can have names. Hint: load and save state to rename it.
+- use up to 99 saved states now instead of 50
+- added Russian user interface translation
+- a number of polishing UI tweaks on the main and settings screens
+
+MK 61/54 v2.0
+- added MK-54 emulation
+- application name was changed to "MK 61/54" to reflect the fact it supports both devices
+- when calculator is switched off, selector button chooses between "MK 61" and "MK-54"
+- save states remember which calculator type they were saved with
+- old save states use MK 61 device
+
+- added soft "Menu" button on devices that lack hardware menu button
+- added support for older Android versions, including Android 1.6
+- additional UI polishing for tablets
+
+v2.1:
+- "MK 61 ↔ MK-54" button is now menu option (available when calculator is off)
+- "About" moved from settings to menu, now with usage hints
+
+- fixed calculator's display font size issue:
+ * entering power of ten should not split display into two lines (was an issue on some devices)
+ * width should be fully used
+
+- ШГ→/ШГ←/↔ got better labels
+
+- fixed/improved layout on devices with low and medium resolution
+
+v2.2:
+- fixed UI scaling issue on normal-mdpi screens
+- improved large-mdpi screens
+
+If you still have issues - please let me know device/firmware this happens on.
+
+- added thin border around buttons
+
+v2.3:
+- fixed state saving instability on leaving app
+- fixed layout resizing glitch
+- switching calculator off and state saving/loading became faster
+
+- added user preferences for:
+* type of on/off and angle mode switches (checkbox/radio buttons or slider)
+* vibration intensity
+* buttons outline
+* labels text size
+
+

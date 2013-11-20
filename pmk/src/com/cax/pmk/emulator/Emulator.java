@@ -46,11 +46,13 @@ public class Emulator extends Thread implements EmulatorInterface
 	}
 
 	public void setAngleMode(int mode) {
+		mode = (mode == 0) ? 0 : 3 - mode; // convert to Rad=0, Grad=2, Deg=1 as emulator engine expects
 		angle_mode = mode + 10;
 	}
 
 	public int getAngleMode() {
-		return angle_mode - 10;
+		int mode = angle_mode - 10;
+		return (mode == 0) ? 0 : 3 - mode;  // convert back to Rad=0, Grad=1, Deg=2 for UI convenience
 	}
 
 	public void setSpeedMode(int mode) {
@@ -124,6 +126,7 @@ public class Emulator extends Thread implements EmulatorInterface
 		IK1303.keyb_y = 1;
 		IK1303.keyb_x = angle_mode;
 		for (int ix = 0; ix < 560; ix++) {
+			if (runningState <= 0) break;
 			if (speed_mode>0) try { sleep(1); } catch (InterruptedException e) {}
 			for (int j = 0; j < 42; j++) { 
 				tick();

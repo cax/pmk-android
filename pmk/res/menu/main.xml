@@ -8,13 +8,13 @@
           android:icon="@android:drawable/ic_menu_preferences"
           android:title="@string/menu_settings" />
  
-    <item android:id="@+id/menu_save"
-          android:icon="@android:drawable/ic_menu_save"
-          android:title="@string/menu_save" />
-    
     <item android:id="@+id/menu_load"
           android:icon="@android:drawable/ic_menu_upload"
           android:title="@string/menu_load" />
+    
+    <item android:id="@+id/menu_save"
+          android:icon="@android:drawable/ic_menu_save"
+          android:title="@string/menu_save" />
     
     <item android:id="@+id/menu_swap_model"
           android:icon="@android:drawable/ic_menu_always_landscape_portrait"

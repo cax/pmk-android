@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="com.cax.pmk"
-    android:versionCode="220"
-    android:versionName="2.2" xmlns:android="http://schemas.android.com/apk/res/android">
+    android:versionCode="230"
+    android:versionName="2.3" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-sdk
         android:minSdkVersion="4"
@@ -31,6 +31,11 @@
     		android:screenOrientation="portrait"
             android:theme="@style/Theme.FullScreen"/>
 
-    </application>
+        <activity android:name=".SplashScreenActivity"
+            android:configChanges="orientation"
+    		android:screenOrientation="portrait"
+            android:theme="@style/Theme.FullScreen"/>
+
+        </application>
 
 </manifest>

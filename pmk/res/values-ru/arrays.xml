@@ -3,11 +3,11 @@
 <resources>
 	 
 	    <string-array name="sizes">
-	        <item name="10">Smallest</item>
-	        <item name="20">Smaller</item>
-	        <item name="30">Default size</item>
-	        <item name="40">Bigger</item>
-	        <item name="50">Biggest</item>
+	        <item name="10">Ещё меньше</item>
+	        <item name="20">Меньше</item>
+	        <item name="30">Обычного размера</item>
+	        <item name="40">Больше</item>
+	        <item name="50">Ещё больше</item>
 		</string-array>
 	     
 	    <string-array name="sizesValues">

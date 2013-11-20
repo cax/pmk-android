@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="locale">ru</string>
+    
 	<string name="menu_load">Загрузить</string>
 	<string name="menu_save">Сохранить</string>
 	<string name="menu_settings">Настройки</string>
 	<string name="menu_about">О программе</string>
 		
-	<string name="settings_vibrate_title">Вибрировать</string>
-	<string name="settings_vibrate_summary">Тактильная обратная связь для клавиш и переключателей</string>
+	<string name="settings_category_screen">Экран</string>
 	<string name="settings_screen_always_on_title">Не отключать экран</string>
 	<string name="settings_screen_always_on_summary">Не уходить в спящий режим по истечению срока бездействия</string>
-
+	
+	<string name="settings_category_switches">Переключатели</string>
+	<string name="settings_slider_on_off">Переключатель \"Вкл\"</string>
+	<string name="settings_slider_on_off_summary">Показывать \"Вкл\" как переключатель или как флаг-кнопку</string>
+	<string name="settings_slider_angle">Переключатель Р/ГРД/Г</string>
+	<string name="settings_slider_angle_summary">Показывать \"Р/ГРД/Г\" как переключатель или как 3 кнопки</string>
+	
+	<string name="settings_category_vibration">Вибрация</string>
+	<string name="settings_vibrate_title">Вибрировать</string>
+	<string name="settings_vibrate_summary">Тактильная обратная связь для клавиш и переключателей</string>
+	<string name="settings_vibrate_keypad_more_title">Вибрировать сильнее</string>
+	<string name="settings_vibrate_keypad_more_summary">Усиленная вибрация клавиш</string>
+	
+	<string name="settings_category_border">Окантовка клавиш</string>
+	<string name="settings_border_black_buttons">Окантовка чёрных</string>
+	<string name="settings_border_black_buttons_summary">Тонкий белый ободок вокруг чёрных клавиш</string>
+	<string name="settings_border_other_buttons">Окантовка остальных</string>
+	<string name="settings_border_other_buttons_summary">Тонкий чёрный ободок вокруг всех клавиш кроме чёрных</string>
+	
+	<string name="settings_category_scaling">Масштабирование</string>
+	<string name="settings_scaling_buttons">Надписи на клавишах</string>
+	<string name="settings_scaling_buttons_summary">Задать размер текста надписей на клавишах</string>
+	<string name="settings_scaling_labels">Надписи над клавишами</string>
+	<string name="settings_scaling_labels_summary">Задать размер текста надписей над и под клавишами</string>
+		
 	<string name="label_save">Сохранить</string>
 	<string name="label_load">Загрузить</string>
 	<string name="label_cancel">Отмена</string>
