@@ -3,6 +3,16 @@
 
 <string name="app_name">MK 61</string>
 
+<string name="menu_load">Load</string>
+<string name="menu_save">Save</string>
+<string name="menu_settings">Settings</string>
+
+<string name="settings_vibrate_title">Vibrate</string>
+<string name="settings_vibrate_summary">Enable haptic feedback for buttons and switches</string>
+<string name="settings_screen_always_on_title">Keep screen on</string>
+<string name="settings_screen_always_on_summary">Don\'t dim or switch display off</string>
+<string name="settings_about_title">About</string>
+
 <string name="checkBoxPowerOnOff">Вкл</string>
 <string name="TextViewRadians">P</string>
 <string name="TextViewDegrees">Г</string>

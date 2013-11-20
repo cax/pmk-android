@@ -17,7 +17,6 @@
         android:onClick="onIndicator" >
 
         <TextView
-            android:keepScreenOn="true"
             android:id="@+id/textView_Indicator"
             android:layout_width="match_parent"
             android:layout_height="fill_parent"
@@ -27,9 +26,10 @@
             android:maxLines="1"
             android:paddingLeft="4dp"
             android:paddingRight="0dp"
+            android:text="-9.8765432-10"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#77FF77"
-            android:textSize="48sp" />
+            android:textSize="@dimen/indicator_font_size" />
 
     </LinearLayout>
 

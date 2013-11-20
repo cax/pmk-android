@@ -9,10 +9,13 @@ import java.io.ObjectOutputStream;
 
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.graphics.LightingColorFilter;
@@ -21,6 +24,7 @@ import android.graphics.Typeface;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -39,15 +43,26 @@ public class MainActivity extends Activity {
 	private int speedMode = 0;
 	private TextView calculatorDisplay = null;
 	private Vibrator vibrator = null;
+	private boolean  vibrate = true;
 		
     // ----------------------- Activity life cycle handlers --------------------------------
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
-        vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
-        
+
+        calculatorDisplay = (TextView) findViewById(R.id.textView_Indicator);
+        Typeface tf = Typeface.createFromAsset(this.getAssets(), "fonts/digital-7-mod.ttf");
+        calculatorDisplay.setTypeface(tf);
+        calculatorDisplay.setText("");
+
+        tf = Typeface.createFromAsset(this.getAssets(), "fonts/missing-symbols.ttf");
+        ((TextView)findViewById(R.id.labelSquare))  .setTypeface(tf);
+        ((TextView)findViewById(R.id.labelEpowerX)) .setTypeface(tf);
+        ((TextView)findViewById(R.id.label10powerX)).setTypeface(tf);
+        ((TextView)findViewById(R.id.labelXpowerY)) .setTypeface(tf);
+        ((TextView)findViewById(R.id.labelDot))     .setTypeface(tf);
+
         findViewById(R.id.buttonF)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x00F5E345)); // yellow
         findViewById(R.id.buttonK)    .getBackground().setColorFilter(new LightingColorFilter(0x00000000, 0x0071E3FF)); // blue
         findViewById(R.id.buttonClear).getBackground().setColorFilter(0xFFFF0000, PorterDuff.Mode.MULTIPLY);            // red
@@ -60,16 +75,10 @@ public class MainActivity extends Activity {
         	findViewById(button).getBackground().setColorFilter(new LightingColorFilter(0,0));
         }
 
-        calculatorDisplay = (TextView) findViewById(R.id.textView_Indicator);
-        Typeface tf = Typeface.createFromAsset(this.getAssets(), "fonts/digital-7-mod.ttf");
-        calculatorDisplay.setTypeface(tf);
-
-        tf = Typeface.createFromAsset(this.getAssets(), "fonts/missing-symbols.ttf");
-        ((TextView)findViewById(R.id.labelSquare))  .setTypeface(tf);
-        ((TextView)findViewById(R.id.labelEpowerX)) .setTypeface(tf);
-        ((TextView)findViewById(R.id.label10powerX)).setTypeface(tf);
-        ((TextView)findViewById(R.id.labelXpowerY)) .setTypeface(tf);
-        ((TextView)findViewById(R.id.labelDot))     .setTypeface(tf);
+        vibrator = (Vibrator) this.getSystemService(VIBRATOR_SERVICE);
+        
+        PreferenceManager.setDefaultValues(this, R.layout.preferences, false);
+        activateSettings();
 	}
 
     @Override
@@ -85,6 +94,12 @@ public class MainActivity extends Activity {
     	super.onStop();
        	saveState(-1);
     }
+
+    @Override
+    public void onResume() {
+    	super.onResume();
+        activateSettings();
+    }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -97,8 +112,8 @@ public class MainActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	 switch (item.getItemId()) {
-    	    case R.id.menu_about:
-    	        aboutDialog();
+    	    case R.id.menu_settings:
+    	    	goSettingsScreen();
     	        return true;
     	    case R.id.menu_save:
     	    	chooseAndUseSaveSlot(true);
@@ -111,7 +126,7 @@ public class MainActivity extends Activity {
     	    }
     }
     
-    // ----------------------- UI callbacks --------------------------------
+    // ----------------------- UI call backs --------------------------------
     // calculator indicator click callback
     public void onIndicator(View view) {
         if (emulator != null) {
@@ -124,7 +139,7 @@ public class MainActivity extends Activity {
     // calculator power switch callback
     public void onPower(View view) {
     	switchOnCalculator(((CheckBox)view).isChecked());
-    	vibrator.vibrate(300);
+    	if (vibrate) vibrator.vibrate(100);
     }
     
     // calculator mode switch callback
@@ -132,7 +147,7 @@ public class MainActivity extends Activity {
         angleMode = Integer.parseInt((String)view.getTag());
         if (emulator != null) {
         	emulator.setAngleMode(angleMode);
-        	vibrator.vibrate(20);
+        	if (vibrate) vibrator.vibrate(20);
         }
     }
 
@@ -143,7 +158,7 @@ public class MainActivity extends Activity {
     	
     	int keycode = Integer.parseInt((String)view.getTag());
     	emulator.keypad(keycode);
-    	vibrator.vibrate(15);
+    	if (vibrate) vibrator.vibrate(15);
     }
     
     // Show string on calculator display 
@@ -197,48 +212,11 @@ public class MainActivity extends Activity {
 		alert.show();		
 	}
 	
-	private void aboutDialog() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
- 
-		// set title
-		alertDialogBuilder.setTitle("About");
- 
-		String versionName = "";
-		try {
-			versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-		} catch (NameNotFoundException e) {
-		    e.printStackTrace();
-		}
-		    
-		// set dialog message
-		alertDialogBuilder.setMessage(""
-			 + "\"Electronica MK 61\" emulator\n"
-			 + "\n"
-			 + "App developer:\n"
-			 + "Stanislav Borutsky\n"
-			 + "stanislavb@gmail.com\n"
-			 + "\n"
-			 + "Version:\n"
-			 + versionName + "\n"
-			 + "\n"
-			 + "Based on emu145 project\n"
-			 + "by Felix Lazarev\n"
-			 + "code.google.com/p/emu145\n"
-		);
-
-		alertDialogBuilder.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-					dialog.cancel();
-			}
-		});
-
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
- 
-		// show it
-		alertDialog.show();
+    private void goSettingsScreen() {
+    	Intent settingsScreen = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(settingsScreen);
     }
-
+    
 	// ----------------------- Save/Load emulator state --------------------------------
     private String getSlotDisplayName(int i) {
     	String filename = getSlotFilename(i);
@@ -348,6 +326,12 @@ public class MainActivity extends Activity {
     }
 
     // ----------------------- Other --------------------------------
+    private void activateSettings() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        vibrate = sharedPref.getBoolean(SettingsActivity.PREFERENCE_VIBRATE, true);
+  		calculatorDisplay.setKeepScreenOn(sharedPref.getBoolean(SettingsActivity.PREFERENCE_SCREEN_ALWAYS_ON, true));
+    }
+        
     private void setIndicatorColor() {
     	String color = "#000000";
     	if (emulator != null) {

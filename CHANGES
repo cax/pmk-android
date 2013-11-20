@@ -1,3 +1,8 @@
+v1.6	(03 Sep 2013)
+
+ * added "Settings" page to let user choose vibration and/or disabled screen auto-off
+ * indicator font size fix for tablets
+
 v1.5	(02 Sep 2013)
 
  * main screen user interface completely redesigned from the scratch

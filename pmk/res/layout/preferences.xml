@@ -1,0 +1,17 @@
+<PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android">
+		<CheckBoxPreference 
+		    android:title="@string/settings_vibrate_title"
+		    android:summary="@string/settings_vibrate_summary"
+		    android:key="pref_vibrate"
+		    android:defaultValue="true"/>
+		
+		<CheckBoxPreference
+		    android:title="@string/settings_screen_always_on_title"
+		    android:summary="@string/settings_screen_always_on_summary"
+		    android:key="pref_screen_always_on"
+		    android:defaultValue="true"/>
+		
+		<Preference 
+		    android:title="@string/settings_about_title" 
+		    android:key="about"/>
+</PreferenceScreen>
