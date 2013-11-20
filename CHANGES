@@ -1,3 +1,13 @@
+v1.4	(28 Aug 2013)
+
+ * fix emulation for entering negative exponent
+ * 10x speed increase - now works even on old Android devices
+ * touch indicator to toggle fast/slow mode
+ * on fast phone use slow mode for blinking
+ * fixed key press detection
+ * fixed indicator symbols size
+ * stable states saving implementation - will be compatible with future versions
+
 v1.3	(25 Aug 2013)
 
  * added "About" dialog
