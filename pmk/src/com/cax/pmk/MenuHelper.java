@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.view.ContextThemeWrapper;
 import android.widget.TextView;
+import com.cax.pmk.R;
 
 public class MenuHelper {
 
@@ -19,7 +20,7 @@ public class MenuHelper {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(mainActivity);
  
 		// set title
-		alertDialogBuilder.setTitle(getString(R.string.menu_about));
+		alertDialogBuilder.setTitle(getString(R.string.menu_about) + " " + getString(R.string.app_name));
  
 		String versionName = "";
 		try {
@@ -56,7 +57,7 @@ public class MenuHelper {
 	
 		builder.setSingleChoiceItems(new String[] {getString(R.string.item_mk61), getString(R.string.item_mk54)}, mkModel, new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int item) {
-		    	mainActivity.setMkModel(item);
+		    	mainActivity.setMkModel(item, false);
 				dialog.cancel();
 		    }
 		});
@@ -67,7 +68,7 @@ public class MenuHelper {
 
     // on settings menu selected
     static void goSettingsScreen() {
-    	Intent settingsScreen = new Intent(mainActivity.getApplicationContext(), SettingsActivity.class);
+    	Intent settingsScreen = new Intent(mainActivity.getApplicationContext(), PreferencesActivity.class);
     	mainActivity.startActivity(settingsScreen);
     }
 

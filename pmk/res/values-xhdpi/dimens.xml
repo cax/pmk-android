@@ -2,6 +2,6 @@
 
     <dimen name="button_font_size_regular">25sp</dimen>
     <dimen name="label_font_size">14sp</dimen>
-    
     <dimen name="button_radius">4dp</dimen>
+
 </resources>

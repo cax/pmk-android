@@ -18,10 +18,21 @@
     </style>
 
     <style name="AlertDialogTheme" parent="android:Theme.Dialog">
-    	<item name="android:textSize">16sp</item>
-	</style>
+        <item name="android:textSize">16sp</item>
+    </style>
 
+    <style name="PreferencesTheme" parent="@android:style/Theme">
+    </style>
+    
+    <!-- Standard configuration for the AutoScaleTextView -->
+    <style name="autoScaleTextView">
+        <!-- use the next line to alter the minimum text size (uncomment first) -->
+        <!-- <item name="@attr/minTextSize">10dp</item> -->
+    </style>
     <style name="Theme.Default" parent="@android:style/Theme"></style>
+
     <style name="Theme.NoTitle" parent="@android:style/Theme.NoTitleBar"></style>
+
     <style name="Theme.FullScreen" parent="@android:style/Theme.NoTitleBar.Fullscreen"></style>
+
 </resources>

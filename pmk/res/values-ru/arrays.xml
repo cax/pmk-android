@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-	 
 <resources>
-	 
-	    <string-array name="sizes">
-	        <item name="10">Ещё меньше</item>
-	        <item name="20">Меньше</item>
-	        <item name="30">Обычного размера</item>
-	        <item name="40">Больше</item>
-	        <item name="50">Ещё больше</item>
-		</string-array>
-	     
-	    <string-array name="sizesValues">
-	        <item name="10">0.8</item>
-	        <item name="20">0.9</item>
-	        <item name="30">1</item>
-	        <item name="40">1.1</item>
-	        <item name="50">1.2</item>
-</string-array>
-	 
+
+    <string-array name="sizes">
+        <item name="10">Ещё меньше</item>
+        <item name="20">Меньше</item>
+        <item name="30">Обычного размера</item>
+        <item name="40">Больше</item>
+        <item name="50">Ещё больше</item>
+    </string-array>
+    <string-array name="buttonSounds">
+        <item name="1">Звук клавиши 1</item>
+        <item name="2">Звук клавиши 2</item>
+        <item name="3">Звук клавиши 3</item>
+        <item name="4">Звук клавиши 4</item>
+        <item name="5">Звук клавиши 5</item>
+    </string-array>
+
 </resources>

@@ -1,12 +1,31 @@
 <resources>
 
-    <dimen name="button_font_size_regular">25sp</dimen>
+    <dimen name="indicator_top_margin">1dp</dimen>
+    <dimen name="indicator_left_padding">4dp</dimen>
+    <dimen name="indicator_right_padding">0dp</dimen>
+    <dimen name="indicator_min_height">55dp</dimen>
+    <dimen name="indicator_orig_text_size">130sp</dimen>
     <dimen name="label_font_size">14sp</dimen>
-    
+    <dimen name="label_left_padding">5dp</dimen>
+    <dimen name="label_right_padding">5dp</dimen>
+    <dimen name="switches_height">61dp</dimen>
+    <dimen name="switches_margin">5dp</dimen>
+    <dimen name="radio_button_margin">2dp</dimen>
+    <dimen name="slider_label_margin">3dp</dimen>
+    <dimen name="slider_progress_border">8px</dimen>
+    <dimen name="slider_thumb_border">16px</dimen>
+    <dimen name="slider_height">35dp</dimen>
+    <dimen name="slider_width_angle_mode">140dp</dimen>
+    <dimen name="slider_thumb_width_angle_mode">70dp</dimen>
+    <dimen name="slider_width_on_off">65dp</dimen>
+    <dimen name="slider_thumb_width_on_off">50dp</dimen>
+    <dimen name="button_font_size_regular">25sp</dimen>
     <dimen name="button_radius">4dp</dimen>
     <dimen name="button_white_border">2px</dimen>
     <dimen name="button_black_border">4px</dimen>
-    <dimen name="slider_progress_border">8px</dimen>
-    <dimen name="slider_thumb_border">16px</dimen>
-    
+    <dimen name="button_drawable_bottom">3dp</dimen>
+    <dimen name="button_drawable_left">5dp</dimen>
+    <dimen name="button_drawable_right">5dp</dimen>
+    <dimen name="button_drawable_top">3dp</dimen>
+
 </resources>

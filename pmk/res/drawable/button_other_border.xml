@@ -10,6 +10,10 @@
             <solid android:color="@color/buttonBackgroundGray" />
 
             <corners android:radius="@dimen/button_radius" />
+
+            <stroke
+                android:width="@dimen/button_black_border"
+                android:color="@color/buttonBorderBlack" />
         </shape>
     </item>
 

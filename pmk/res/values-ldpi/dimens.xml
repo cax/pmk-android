@@ -2,11 +2,10 @@
 
     <dimen name="button_font_size_regular">20sp</dimen>
     <dimen name="label_font_size">12sp</dimen>
-    
     <dimen name="button_radius">3dp</dimen>
     <dimen name="button_white_border">1px</dimen>
     <dimen name="button_black_border">1px</dimen>
     <dimen name="slider_progress_border">4px</dimen>
     <dimen name="slider_thumb_border">8px</dimen>
-    
+
 </resources>

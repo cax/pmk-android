@@ -34,9 +34,12 @@ public class SaveStateManager {
 	private File getFileStreamPath(String file) { return mainActivity.getFileStreamPath(file); }
 	
 	SaveStateManager(MainActivity mainActivity) {
-		this.mainActivity =mainActivity;  
+		this.mainActivity = mainActivity;  
 	}
 	
+	void setMainActivity(MainActivity mainActivity) {
+		this.mainActivity = mainActivity;  
+	}
 	// ----------------------- Dialogs --------------------------------
     void chooseAndUseSaveSlot(final EmulatorInterface emulator, final boolean save) {
 		if (save && emulator == null) // disable saving when calculator is switched off
@@ -157,7 +160,7 @@ public class SaveStateManager {
     	FileOutputStream fileOut = null;
     	ObjectOutputStream out = null;
 
-    	emulator.stopEmulator();
+    	emulator.stopEmulator(false);
     	
 		try {
 			fileOut = mainActivity.openFileOutput(filename, Context.MODE_PRIVATE);
@@ -198,14 +201,14 @@ public class SaveStateManager {
 		}
 
     	if (emulator != null) {
-    		emulator.stopEmulator();
+    		emulator.stopEmulator(false);
     	}
     	
     	mainActivity.setEmulator(loadedEmulator);
     	emulator = loadedEmulator;
     	emulator.initTransient(mainActivity);
 
-    	mainActivity.setMkModel(emulator.getMkModel());
+    	mainActivity.setMkModel(emulator.getMkModel(), false);
 
     	mainActivity.setIndicatorColor(emulator.getSpeedMode());
     	mainActivity.setAngleModeControl(emulator.getAngleMode());

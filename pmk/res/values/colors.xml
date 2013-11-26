@@ -1,9 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="commonBackground">#404040</color>
+    <color name="commonBackgroundGrayscale">#707070</color>
+    
+    <color name="aboveButtonTextYellow">#FFFF00</color>
+    <color name="aboveButtonTextYellowGrayscale">#FFFFFF</color>
+    <color name="aboveButtonTextBlue">#74BDFA</color>
+    <color name="aboveButtonTextBlueGrayscale">#000000</color>
+    <color name="underButtonTextWhite">#FFFFFF</color>
+    
+    <color name="buttonTextBlack">#000000</color>
+    <color name="buttonTextWhite">#FFFFFF</color>
 
-<color name="yellowColor">#FFFF00</color>
-<color name="blueColor">#74BDFA</color>
-<color name="blackColor">#000000</color>
-<color name="whiteColor">#FFFFFF</color>
+    <color name="buttonBackgroundYellow">#F5E345</color>
+    <color name="buttonBackgroundYellowGrayscale">#EEEEEE</color>
+    <color name="buttonBackgroundBlue">#71E3FF</color>
+    <color name="buttonBackgroundBlueGrayscale">#444444</color>
+    <color name="buttonBackgroundBlack">#000000</color>
+    <color name="buttonBackgroundGray">#CCCCCC</color>
+    <color name="buttonBackgroundRed">#F00505</color>
+    <color name="buttonBackgroundRedGrayscale">#222222</color>
+    
+    <color name="buttonBorderWhite">#CCCCCC</color>
+    <color name="buttonBorderBlack">#000000</color>
 
+    <color name="sliderBackground">#222222</color>
+    <color name="sliderGradientStart">#555555</color>
+    <color name="sliderGradientEnd">#CCCCCC</color>
+        
+    <color name="indicatorDigits">#77FF77</color>
+    <color name="indicatorDigitsGrayscale">#FFFFFF</color>
+    <color name="indicatorOff">#000000</color>
+    <color name="indicatorSlowSpeedMode">#103010</color>
+    <color name="indicatorSlowSpeedModeGrayscale">#222222</color>
+    <color name="indicatorFastSpeedMode">#255525</color>
+    <color name="indicatorFastSpeedModeGrayscale">#444444</color>
+    
 </resources>

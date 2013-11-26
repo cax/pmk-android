@@ -1,3 +1,17 @@
+2.4 beta (26 Nov 2013)
+
+ * enlarged launcher icon
+ * long touch on indicator hides/shows calculator switches
+ * long touch on "Вкл" label acts as Menu button (for weird devices without this button)
+ * redesigned preferences screen
+ * synchronized state saving
+ * major code cleanup
+ * preferences for the new functionality added:
+ ** grayscale screen mode (for e-ink screens)
+ ** show/hide status bar
+ ** buttons produce sound chosen by user
+ ** buttons can react on touch and not on release
+
 v2.3	(7 Oct 2013)
 
  * fixed state saving instability on leaving app

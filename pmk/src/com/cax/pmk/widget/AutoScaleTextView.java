@@ -3,12 +3,11 @@ package com.cax.pmk.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.widget.TextView;
 import com.cax.pmk.R;
-import com.cax.pmk.R.attr;
-import com.cax.pmk.R.styleable;
 
 /**
  * A custom Text View that lowers the text size when the text is to big for the TextView. 
@@ -82,6 +81,13 @@ public class AutoScaleTextView extends TextView
 
                 this.textPaint.set(this.getPaint());
 
+                if (this.textPaint.measureText(text) >= targetWidth) {
+                    this.minTextSize = 0; // too big - recalculate the min
+                }
+
+                if (targetWidth - this.textPaint.measureText(text) > 50) {
+                	this.preferredTextSize *= 2; // too small
+                }
                 while ((this.preferredTextSize - this.minTextSize) > threshold)
                 {
                         float size = (this.preferredTextSize + this.minTextSize) / 2;
@@ -95,6 +101,12 @@ public class AutoScaleTextView extends TextView
                 this.setTextSize(TypedValue.COMPLEX_UNIT_PX, this.minTextSize);
         }
 
+        public void refitNow()
+        {
+        		this.minTextSize *= 2;
+        		this.textPaint.setTextSize(minTextSize);
+                this.refitText(this.getText().toString(), this.getWidth());
+        }
         @Override
         protected void onTextChanged(final CharSequence text, final int start, final int before, final int after)
         {
@@ -102,10 +114,11 @@ public class AutoScaleTextView extends TextView
         }
 
         @Override
-        protected void onSizeChanged(int width, int height, int oldwidth, int oldheight)
+        protected void onSizeChanged(final int width, int height, int oldwidth, int oldheight)
         {
-                if (width != oldwidth)
-                        this.refitText(this.getText().toString(), width);
+                if (width != oldwidth) {
+                	new Handler().postDelayed(new Runnable() {public void run() { refitText(getText().toString(), width); } }, 1);
+                }
         }
 
 }

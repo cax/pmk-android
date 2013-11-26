@@ -12,7 +12,7 @@ public interface EmulatorInterface extends Runnable, java.io.Externalizable
     public String getSaveStateName();
     public void keypad(int keycode);
     public void initTransient(MainActivity mainActivity);
-    public void stopEmulator();
+    public void stopEmulator(boolean forced);
     public void run();
 	public void start();
 }

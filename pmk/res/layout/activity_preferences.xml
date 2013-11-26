@@ -1,0 +1,177 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <!-- ================ -->
+    <!-- Screen settings -->
+    <!-- ================ -->
+
+    <PreferenceScreen
+        android:key="pref_screen_screen_settings"
+        android:layout="@layout/preferences_layout"
+        android:summary="@string/settings_screen_summary"
+        android:title="@string/settings_screen" >
+
+        <PreferenceCategory
+            android:key="pref_category_screen"
+            android:title="@string/settings_category_screen" >
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_screen_always_on"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_screen_always_on_summary"
+                android:title="@string/settings_screen_always_on_title" />
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_full_screen"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_full_screen_summary"
+                android:title="@string/settings_full_screen_title" />
+
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_grayscale"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_grayscale_summary"
+                android:title="@string/settings_grayscale_title" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <!-- ==================== -->
+    <!-- UI appearance screen -->
+    <!-- ==================== -->
+
+    <PreferenceScreen
+        android:key="pref_screen_ui_visual_settings"
+        android:layout="@layout/preferences_layout"
+        android:summary="@string/settings_ui_visual_summary"
+        android:title="@string/settings_ui_visual" >
+
+        <PreferenceCategory
+            android:key="pref_category_switches"
+            android:title="@string/settings_category_switches" >
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_slider_on_off"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_slider_on_off_summary"
+                android:title="@string/settings_slider_on_off" />
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_slider_angle"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_slider_angle_summary"
+                android:title="@string/settings_slider_angle" />
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:key="pref_category_border"
+            android:title="@string/settings_category_border" >
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_border_black_buttons"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_border_black_buttons_summary"
+                android:title="@string/settings_border_black_buttons" />
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_border_other_buttons"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_border_other_buttons_summary"
+                android:title="@string/settings_border_other_buttons" />
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:key="pref_category_scaling"
+            android:title="@string/settings_category_scaling" >
+
+            <ListPreference
+                android:defaultValue="1"
+                android:entries="@array/sizes"
+                android:entryValues="@array/sizesValues"
+                android:key="pref_button_text_size"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_scaling_buttons_summary"
+                android:title="@string/settings_scaling_buttons" />
+
+            <ListPreference
+                android:defaultValue="1"
+                android:entries="@array/sizes"
+                android:entryValues="@array/sizesValues"
+                android:key="pref_label_text_size"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_scaling_labels_summary"
+                android:title="@string/settings_scaling_labels" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <!-- ================== -->
+    <!-- UI behavior screen -->
+    <!-- ================== -->
+
+    <PreferenceScreen
+        android:key="pref_screen_ui_behavior_settings"
+        android:layout="@layout/preferences_layout"
+        android:summary="@string/settings_ui_behavior_summary"
+        android:title="@string/settings_ui_behavior" >
+
+        <PreferenceCategory
+            android:key="pref_category_buttons"
+            android:title="@string/settings_category_buttons" >
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_on_button_touch"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_on_button_touch_summary"
+                android:title="@string/settings_on_button_touch_title" />
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:key="pref_category_vibration"
+            android:title="@string/settings_category_vibration" >
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_vibrate"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_vibrate_summary"
+                android:title="@string/settings_vibrate_title" />
+
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_vibrate"
+                android:key="pref_vibrate_keypad_more"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_vibrate_keypad_more_summary"
+                android:title="@string/settings_vibrate_keypad_more_title" />
+        </PreferenceCategory>
+
+        <PreferenceCategory
+            android:key="pref_category_sound"
+            android:title="@string/settings_category_sound" >
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_sound"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_sound_summary"
+                android:title="@string/settings_sound_title" />
+
+            <ListPreference
+                android:defaultValue="1"
+                android:dependency="pref_sound"
+                android:entries="@array/buttonSounds"
+                android:entryValues="@array/buttonSoundsValues"
+                android:key="pref_button_sound"
+                android:layout="@layout/preferences_layout"
+                android:summary="@string/settings_button_sound_summary"
+                android:title="@string/settings_button_sound_title" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+</PreferenceScreen>

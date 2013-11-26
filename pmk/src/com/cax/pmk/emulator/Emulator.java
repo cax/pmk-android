@@ -5,6 +5,9 @@ import com.cax.pmk.*;
 
 public class Emulator extends Thread implements EmulatorInterface
 {
+	enum RunningState {
+		RUNNING, STOPPED, STOPPING_NORMAL, STOPPING_FORCED
+	};
 	public Emulator() {}
 
 	public void initTransient(MainActivity mainActivity) {
@@ -34,14 +37,26 @@ public class Emulator extends Thread implements EmulatorInterface
 	}
 
 	public void run() {
-		runningState = 1;
-		while(runningState > 0) step();
-		runningState = -1;
+		runningState = RunningState.RUNNING;
+		while(runningState == RunningState.RUNNING) step();
+		
+		if (runningState != RunningState.STOPPING_FORCED) {
+			while(! (IR2_1.microtick == 84 && syncCounter == 0))
+				tick42();
 	}
 
-	public void stopEmulator() {
-		runningState = 0;
-        while (runningState == 0)
+		runningState = RunningState.STOPPED;
+        mainActivity = null;
+	}
+
+	public void stopEmulator(boolean force) {
+		if (force) {
+			runningState = RunningState.STOPPING_FORCED;
+		} else {
+			runningState = RunningState.STOPPING_NORMAL;
+		}
+
+		while (runningState == RunningState.STOPPING_NORMAL || runningState == RunningState.STOPPING_FORCED)
         	try { sleep(10); } catch (Exception e) {}
 	}
 
@@ -100,7 +115,7 @@ public class Emulator extends Thread implements EmulatorInterface
 			displayString.append(show_symbols[indicator[ix]]);
 			displayString.append(ind_comma[ix] ? "." : "/");
 		}
-		mainActivity.setDisplay(displayString.toString());
+		mainActivity.displayIndicator(displayString.toString());
 	}
 
 	void tick() {
@@ -121,34 +136,47 @@ public class Emulator extends Thread implements EmulatorInterface
 		IK1302.M[((IK1302.microtick >>> 2) + 41) % 42] = IR2_2.out;
 	}
 	
+	boolean tick42() {
+		for (int j = 0; j < 42; j++) { 
+			tick();
+		}
+		
+		if (IR2_1.microtick == 84) {
+			syncCounter = (syncCounter + 1) % (mk_model == 0 ? 5 : 7); 
+			if (IK1302.redraw_indic && syncCounter == (mk_model == 0 ? 4 : 6)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	void step() {
+		int i,idx;
 		boolean renew = false;
 		IK1303.keyb_y = 1;
 		IK1303.keyb_x = angle_mode;
 		for (int ix = 0; ix < 560; ix++) {
-			if (runningState <= 0) break;
+			if (runningState == RunningState.STOPPING_FORCED) break;
 			if (speed_mode>0) try { sleep(1); } catch (InterruptedException e) {}
-			for (int j = 0; j < 42; j++) { 
-				tick();
-			}
+			tick42();
 			
 			if (IK1302.redraw_indic) {
-				for (int i = 0; i <= 8; i++) indicator[i] 	  = IK1302.R[(8 - i) * 3];
-				for (int i = 0; i <= 2; i++) indicator[i + 9] = IK1302.R[(11 - i) * 3];
-				for (int i = 0; i <= 8; i++) ind_comma[i]     = IK1302.ind_comma[9 - i];
-				for (int i = 0; i <= 2; i++) ind_comma[i + 9] = IK1302.ind_comma[12 - i];
+				for (i = 0; i <= 8; i++) indicator[i] 	  = IK1302.R[(8 - i) * 3];
+				for (i = 0; i <= 2; i++) indicator[i + 9] = IK1302.R[(11 - i) * 3];
+				for (i = 0; i <= 8; i++) ind_comma[i]     = IK1302.ind_comma[9 - i];
+				for (i = 0; i <= 2; i++) ind_comma[i + 9] = IK1302.ind_comma[12 - i];
 				IK1302.redraw_indic = false;
 			}
 			else
 			{
-				for (int i = 0; i < 12; i++) {
+				for (i = 0; i < 12; i++) {
 					indicator[i] = 15; ind_comma[i] = false;
 					IK1302.redraw_indic = false;
 				}
 			}
 
 			renew = false;
-			for (int idx = 0; idx < 12; idx++) {
+			for (idx = 0; idx < 12; idx++) {
 				if (indicator_old[idx] != indicator[idx]) renew = true;
 				indicator_old[idx] = indicator[idx];
 				if (ind_comma_old[idx] != ind_comma[idx]) renew = true;
@@ -171,12 +199,13 @@ public class Emulator extends Thread implements EmulatorInterface
 	private int speed_mode = 0;  // 0=fast, 1=real speed
 	private int mk_model   = 0;  // 0=MK-61, 1=MK-54
 	
+	private transient int syncCounter = 0;
 	private transient int[] indicator;
 	private transient int[] indicator_old;
 	private transient boolean[] ind_comma;
 	private transient boolean[] ind_comma_old;
     private transient StringBuffer displayString = new StringBuffer(24);
-   	private transient int runningState; // 1=running, 0=stopping, -1=stopped
+   	private transient RunningState runningState;
    	private transient MainActivity mainActivity;
 
 	private static final char[] show_symbols = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', 'L', 'C', 'D', 'E', ' '};
