@@ -17,6 +17,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -214,18 +215,21 @@ public class MainActivity extends Activity {
     // ----------------------- Menu hooks --------------------------------
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        MenuItem menu_save = menu.findItem(R.id.menu_save);      
+        MenuItem menu_save = menu.findItem(R.id.menu_save);
+        MenuItem menu_export = menu.findItem(R.id.menu_export);
         MenuItem menu_swap = menu.findItem(R.id.menu_swap_model);      
 
         if(poweredOn == 1) 
         {           
         	menu_swap.setVisible(false);
         	menu_save.setVisible(true);
+            menu_export.setVisible(true);
         }
         else
         {
         	menu_swap.setVisible(true);
         	menu_save.setVisible(false);
+            menu_export.setVisible(false);
         }
 
         return true;
@@ -255,7 +259,12 @@ public class MainActivity extends Activity {
 			case R.id.menu_load:
 				saveStateManager.chooseAndUseSaveSlot(emulator, false);
 			    return true;
-			    
+             case R.id.menu_export:
+                 saveStateManager.exportState(emulator);
+                 return true;
+             case R.id.menu_import:
+                 saveStateManager.importState(emulator);
+                 return true;
 			default:
 			    return super.onOptionsItemSelected(item);
 			}

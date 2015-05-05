@@ -11,10 +11,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Environment;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class SaveStateManager {
 	
@@ -82,8 +85,7 @@ public class SaveStateManager {
 		AlertDialog alert = builder.create();
 		alert.show();		
 	}
-	
-    
+
 	// ----------------------- Save/Load emulator state --------------------------------
     private void chooseNameAndSaveState(final EmulatorInterface emulator) {
     	String chosenName = emulator.getSaveStateName();
@@ -158,22 +160,68 @@ public class SaveStateManager {
     	String filename = getSlotFilename(slotNumber);
     	
     	FileOutputStream fileOut = null;
-    	ObjectOutputStream out = null;
+        try {
+            fileOut = mainActivity.openFileOutput(filename, Context.MODE_PRIVATE);
+            return saveStateStoppingEmulatorToFile(emulator, fileOut);
+        } catch(IOException i) {
+            return false;
+        } finally {
+            mainActivity.setEmulator(null);
+            try { if (fileOut != null) fileOut.close(); } catch(IOException i) {}
+        }
+    }
 
-    	emulator.stopEmulator(false);
-    	
-		try {
-			fileOut = mainActivity.openFileOutput(filename, Context.MODE_PRIVATE);
-			out = new ObjectOutputStream(fileOut);
-			out.writeObject(emulator);
-			return true;
-	    } catch(IOException i) {
-			  return false;
-		} finally {
-			mainActivity.setEmulator(null);
-			try { if (out != null)         out.close(); } catch(IOException i) {} 
-			try { if (fileOut != null) fileOut.close(); } catch(IOException i) {}
-		}
+    boolean exportState(final EmulatorInterface emulator) {
+        if (emulator == null) // disable saving when calculator is switched off
+            return false;
+
+        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            showErrorMessage(R.string.export_no_sd_card_error);
+            return false;
+        }
+
+        SimpleFileDialog FileOpenDialog =  new SimpleFileDialog(mainActivity, "FileSave",
+                new SimpleFileDialog.SimpleFileDialogListener()
+                {
+                    @Override
+                    public void onChosenDir(String chosenFileName)
+                    {
+                        File file = new File(chosenFileName);
+                        FileOutputStream fileOut = null;
+                        try {
+                            fileOut = new FileOutputStream(file);
+                            if (!saveStateStoppingEmulatorToFile(emulator, fileOut)) {
+                                showErrorMessage(R.string.export_common_error);
+                            }
+                        } catch (IOException e) {
+                            showErrorMessage(R.string.export_common_error);
+                        } finally {
+                            mainActivity.setEmulator(null);
+                            try { if (fileOut != null) fileOut.close(); } catch(IOException i) {}
+                        }
+                    }
+                });
+
+        FileOpenDialog.Default_File_Name = "dump.pmk";
+        FileOpenDialog.chooseFile_or_Dir();
+        return true;
+    }
+
+    private boolean saveStateStoppingEmulatorToFile(EmulatorInterface emulator, FileOutputStream fileOut) {
+        ObjectOutputStream out = null;
+
+        emulator.stopEmulator(false);
+
+        try {
+            out = new ObjectOutputStream(fileOut);
+            out.writeObject(emulator);
+            return true;
+        } catch(IOException i) {
+            return false;
+        } finally {
+            mainActivity.setEmulator(null);
+            try { if (out != null)         out.close(); } catch(IOException i) {}
+        }
     }
 
     boolean loadState(EmulatorInterface emulator, int slotNumber) {
@@ -183,40 +231,78 @@ public class SaveStateManager {
     		return false;
     	
 		FileInputStream fileIn = null;
-		ObjectInputStream in = null;
+        boolean isLoaded = false;
+        try {
+            fileIn = mainActivity.openFileInput(filename);
+            isLoaded = loadStateFromFile(emulator, fileIn);
+        } catch(Exception i) {
+            return false;
+        } finally {
+            try { if (fileIn != null) fileIn.close(); } catch(IOException i) {}
+        }
+        return isLoaded;
+    }
 
-		EmulatorInterface loadedEmulator = null;
-		try {
-			fileIn = mainActivity.openFileInput(filename);
-			in = new ObjectInputStream(fileIn);
-			loadedEmulator = (com.cax.pmk.emulator.Emulator) in.readObject();
-			in.close();
-			fileIn.close();
-			
-	    } catch(Exception i) {
-			  return false;
-		} finally {
-			try { if (in != null)         in.close(); } catch(IOException i) {} 
-			try { if (fileIn != null) fileIn.close(); } catch(IOException i) {}
-		}
+    boolean importState(final EmulatorInterface emulator) {
 
-    	if (emulator != null) {
-    		emulator.stopEmulator(false);
-    	}
-    	
-    	mainActivity.setEmulator(loadedEmulator);
-    	emulator = loadedEmulator;
-    	emulator.initTransient(mainActivity);
+        SimpleFileDialog FileOpenDialog =  new SimpleFileDialog(mainActivity, "FileOpen",
+                new SimpleFileDialog.SimpleFileDialogListener()
+                {
+                    @Override
+                    public void onChosenDir(String chosenFileName)
+                    {
+                        File file = new File(chosenFileName);
+                        FileInputStream fileIn = null;
+                        try {
+                            fileIn = new FileInputStream(file);
+                            if (!loadStateFromFile(emulator, fileIn)) {
+                                showErrorMessage(R.string.import_common_error);
+                            }
+                        } catch (Exception e) {
+                            showErrorMessage(R.string.import_common_error);
+                        } finally {
+                            try { if (fileIn != null) fileIn.close(); } catch(IOException i) {}
+                        }
+                    }
+                });
 
-    	mainActivity.setMkModel(emulator.getMkModel(), false);
+        FileOpenDialog.Default_File_Name = "dump.pmk";
+        FileOpenDialog.chooseFile_or_Dir();
+        return true;
+    }
 
-    	mainActivity.setIndicatorColor(emulator.getSpeedMode());
-    	mainActivity.setAngleModeControl(emulator.getAngleMode());
-    	mainActivity.setPowerOnOffControl(1);
-    	
-    	emulator.start();
+    private boolean loadStateFromFile(EmulatorInterface emulator, FileInputStream fileIn) {
+        ObjectInputStream in = null;
+        EmulatorInterface loadedEmulator = null;
+        try {
+            in = new ObjectInputStream(fileIn);
+            loadedEmulator = (com.cax.pmk.emulator.Emulator) in.readObject();
+            in.close();
+            fileIn.close();
 
-		return true;
+        } catch(Exception i) {
+            return false;
+        } finally {
+            try { if (in != null)         in.close(); } catch(IOException i) {}
+        }
+
+        if (emulator != null) {
+            emulator.stopEmulator(false);
+        }
+
+        mainActivity.setEmulator(loadedEmulator);
+        emulator = loadedEmulator;
+        emulator.initTransient(mainActivity);
+
+        mainActivity.setMkModel(emulator.getMkModel(), false);
+
+        mainActivity.setIndicatorColor(emulator.getSpeedMode());
+        mainActivity.setAngleModeControl(emulator.getAngleMode());
+        mainActivity.setPowerOnOffControl(1);
+
+        emulator.start();
+
+        return true;
     }
 
     void deleteSlot(int slot) {
@@ -224,5 +310,8 @@ public class SaveStateManager {
         if (file.exists())
         	file.delete();
     }
-    
+
+    private void showErrorMessage(int errorTextID) {
+        Toast.makeText(mainActivity, mainActivity.getString(errorTextID), Toast.LENGTH_SHORT).show();
+    }
 }

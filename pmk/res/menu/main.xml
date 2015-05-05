@@ -20,5 +20,13 @@
         android:id="@+id/menu_swap_model"
         android:icon="@android:drawable/ic_menu_always_landscape_portrait"
         android:title="@string/menu_swap"/>
+    <item
+        android:id="@+id/menu_import"
+        android:icon="@android:drawable/ic_menu_upload"
+        android:title="@string/menu_import"/>
+    <item
+        android:id="@+id/menu_export"
+        android:icon="@android:drawable/ic_menu_share"
+        android:title="@string/menu_export"/>
 
 </menu>

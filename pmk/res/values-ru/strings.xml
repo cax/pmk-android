@@ -6,6 +6,8 @@
 	<string name="menu_save">Сохранить</string>
 	<string name="menu_settings">Настройки</string>
 	<string name="menu_about">О программе</string>
+    <string name="menu_export">Экспорт</string>
+    <string name="menu_import">Импорт</string>
 
 <!-- Screen settings screen -->	
 	<string name="settings_screen">Настройки экрана</string>
@@ -67,10 +69,17 @@
 	<string name="label_cancel">Отмена</string>
 	<string name="label_close">Закрыть</string>
 
+<!-- FileBrowser labels -->
+    <string name="label_new_directory">Новый каталог</string>
+    <string name="label_new_directory_name">Имя нового каталога</string>
+
 <!-- Messages -->		
 	<string name="savestate_name_slot">Слот</string>
 	<string name="savestate_name_empty">(свободен)</string>
 	<string name="savestate_name_noname">(без названия)</string>
+    <string name="import_common_error">Ошибка импорта</string>
+    <string name="export_common_error">Ошибка экспорта</string>
+    <string name="export_no_sd_card_error">SD-карта недоступна</string>
 	
 	<string name="msg_choose_name">Введите название сохранения</string>
 	<string name="msg_choose_slot">Выберите слот для</string>
